@@ -9,6 +9,12 @@
  * Model: Llama 3.1 8B Instant via Groq
  */
 const MODEL = "llama-3.1-8b-instant";
+const ALLOWED_GRADES = {
+  correct: 1,
+  mostly_correct: 1,
+  mostly_wrong: 1,
+  incorrect: 1,
+};
 
 function corsHeaders() {
   return {
@@ -19,25 +25,50 @@ function corsHeaders() {
   };
 }
 
-async function callGroq(apiKey, messages, { temperature = 0.2, max_tokens = 400, json = true } = {}) {
-  const body = {
-    model: MODEL,
-    temperature,
-    max_tokens,
-    messages,
-  };
-  if (json) body.response_format = { type: "json_object" };
+async function callGroq(apiKey, messages, { temperature = 0.2, max_tokens = 280, json = true } = {}) {
+  async function once(useJson) {
+    const body = {
+      model: MODEL,
+      temperature,
+      max_tokens,
+      messages,
+    };
+    if (useJson) body.response_format = { type: "json_object" };
 
-  const groqRes = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-    method: "POST",
-    headers: {
-      "content-type": "application/json",
-      authorization: "Bearer " + apiKey,
-    },
-    body: JSON.stringify(body),
-  });
-  const groqData = await groqRes.json();
-  return { groqRes, groqData };
+    const groqRes = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        authorization: "Bearer " + apiKey,
+      },
+      body: JSON.stringify(body),
+      signal: AbortSignal.timeout(12000),
+    });
+    const groqData = await groqRes.json();
+    return { groqRes, groqData };
+  }
+
+  try {
+    let { groqRes, groqData } = await once(json);
+
+    // Groq's json_object mode often rejects Llama output that includes Spanish
+    // quotes. The almost-valid payload is in error.failed_generation — use it
+    // instead of failing the whole request (~0.3s 502 the user sees as a timeout).
+    if (!groqRes.ok && groqData && groqData.error && groqData.error.code === "json_validate_failed") {
+      const failed = String(groqData.error.failed_generation || "").trim();
+      if (failed) {
+        return {
+          groqRes: { ok: true, status: 200 },
+          groqData: { choices: [{ message: { content: failed } }] },
+        };
+      }
+      ({ groqRes, groqData } = await once(false));
+    }
+
+    return { groqRes, groqData };
+  } catch (e) {
+    return once(false);
+  }
 }
 
 function parseJsonLoose(text) {
@@ -46,7 +77,32 @@ function parseJsonLoose(text) {
     .replace(/^```\s*/i, "")
     .replace(/\s*```$/, "")
     .trim();
-  return JSON.parse(cleaned);
+  try {
+    return JSON.parse(cleaned);
+  } catch (e) {
+    const start = cleaned.indexOf("{");
+    const end = cleaned.lastIndexOf("}");
+    if (start >= 0 && end > start) {
+      return JSON.parse(cleaned.slice(start, end + 1));
+    }
+    throw e;
+  }
+}
+
+function normalizeGrade(value, raw) {
+  let grade = String(value || "")
+    .toLowerCase()
+    .replace(/[\s-]+/g, "_");
+  if (grade === "mostly_incorrect" || grade === "partially_wrong") grade = "mostly_wrong";
+  if (grade === "not_correct" || grade === "wrong" || grade === "incorrecto") grade = "incorrect";
+  if (ALLOWED_GRADES[grade]) return grade;
+
+  const blob = String(raw || "").toLowerCase();
+  if (/\bmostly[_\s-]?wrong\b|\bmostly[_\s-]?incorrect\b/.test(blob)) return "mostly_wrong";
+  if (/\bmostly[_\s-]?correct\b/.test(blob)) return "mostly_correct";
+  if (/\bincorrect\b|\bnot correct\b/.test(blob)) return "incorrect";
+  if (/\bcorrect\b/.test(blob)) return "correct";
+  return "mostly_correct";
 }
 
 async function handleGrade(body, apiKey, { log, error, res }) {
@@ -72,17 +128,18 @@ ${rubric}
 Exemplar of a strong answer (for your calibration only — do NOT quote it back verbatim as if the student wrote it):
 ${exemplar || "(none provided)"}
 
-${taskWork ? `Student's earlier practice attempt (context only):\n${taskWork.slice(0, 1500)}\n` : ""}
+${taskWork ? `Student's earlier practice attempt (context only):\n${taskWork.slice(0, 800)}\n` : ""}
 Student's written answer to grade:
-${userAnswer.slice(0, 2500)}
+${userAnswer.slice(0, 1800)}
 
 Grade the answer as exactly one of:
-- correct — captures the core idea(s) in the rubric; wording can differ
-- mostly_correct — partially right or missing an important piece, but shows real understanding
-- incorrect — misses the point, contradicts the rubric, or is too vague/empty to judge
+- correct — captures the core idea(s) in the rubric; wording can differ (scores 100%)
+- mostly_correct — right overall with a small miss or minor language error (scores 80%)
+- mostly_wrong — some relevant content but mostly off, incomplete, or mixed with English (scores 50%)
+- incorrect — misses the point, contradicts the rubric, or is too vague/empty (scores 0%)
 
-Respond with ONLY valid JSON (no markdown fences):
-{"grade":"correct"|"mostly_correct"|"incorrect","feedback":"2-4 sentences. Be encouraging and specific. Say what worked and what to improve. Do not reveal a full model answer word-for-word."}`;
+Respond with ONLY valid JSON (no markdown fences). In string values, do not wrap Spanish phrases in double quotes; use «guillemets» if needed.
+{"grade":"correct"|"mostly_correct"|"mostly_wrong"|"incorrect","feedback":"1-3 sentences. Be encouraging and specific. Say what worked and what to improve. Do not reveal a full model answer word-for-word."}`;
 
   try {
     const { groqRes, groqData } = await callGroq(apiKey, [
@@ -109,13 +166,12 @@ Respond with ONLY valid JSON (no markdown fences):
     } catch (e) {
       log("Raw model text: " + text);
       return res.json({
-        grade: "mostly_correct",
+        grade: normalizeGrade("", text),
         feedback: text.slice(0, 600) || "Could not parse a structured grade. Please retry.",
       });
     }
 
-    const allowed = { correct: 1, mostly_correct: 1, incorrect: 1 };
-    const grade = allowed[parsed.grade] ? parsed.grade : "mostly_correct";
+    const grade = normalizeGrade(parsed.grade, text);
     const feedback = String(parsed.feedback || "No feedback returned.").slice(0, 1200);
 
     return res.json({ grade, feedback });
@@ -157,7 +213,7 @@ Active practice context (do not answer this for them):
 phase=${phase || "none"} sessionMode=${mode || "none"}
 activeQuestion=${activeQuestion || "(none)"}
 
-Reply with ONLY valid JSON:
+Reply with ONLY valid JSON. In string values, do not wrap Spanish phrases in double quotes; use «guillemets» if needed.
 {"reply":"your helpful message in clear bilingual EN/ES when useful, max ~180 words"}`;
 
   const messages = [{ role: "system", content: system }];

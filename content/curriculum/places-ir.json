@@ -15,17 +15,17 @@
       "check": [
         {
           "q": "In English, what can today's model help you do? Include one Spanish example.",
-          "rubric": "correct: clearly explains the communication goal and gives a relevant Spanish example; mostly_correct: goal is clear but the Spanish has minor errors; incorrect: no clear goal, no Spanish example, or meaning is unrelated.",
+          "rubric": "correct: clearly explains the communication goal and gives a relevant Spanish example; mostly_correct: goal is clear but the Spanish has minor errors; mostly_wrong: some relevant idea but missing the Spanish example or mostly English; incorrect: no clear goal, no Spanish example, or meaning is unrelated.",
           "exemplar": "It helps me handle naming places in town. Example: La escuela está cerca."
         },
         {
           "q": "Write two new Spanish lines using at least three of these target words: escuela, tienda, parque, banco, hospital.",
-          "rubric": "correct: two understandable Spanish lines use at least three target words; mostly_correct: one line is strong or minor agreement/spelling errors remain; incorrect: mostly English, copied only, or target words are missing.",
+          "rubric": "correct: two understandable Spanish lines use at least three target words; mostly_correct: one line is strong or minor agreement/spelling errors remain; mostly_wrong: only fragments or one weak line with missing target words; incorrect: mostly English, copied only, or target words are missing.",
           "exemplar": "La escuela está cerca. El parque es grande."
         },
         {
           "q": "For a real conversation, what would you say first, and what would you listen for in the reply?",
-          "rubric": "correct: gives a practical Spanish first line and a realistic listening target; mostly_correct: one part is specific and the other is vague; incorrect: answer does not prepare for an actual exchange.",
+          "rubric": "correct: gives a practical Spanish first line and a realistic listening target; mostly_correct: one part is specific and the other is vague; mostly_wrong: a related idea but not a usable first line or listening target; incorrect: answer does not prepare for an actual exchange.",
           "exemplar": "I would say: \"La escuela está cerca.\" I would listen for place names and location."
         }
       ]
@@ -41,17 +41,17 @@
       "check": [
         {
           "q": "In English, what can today's model help you do? Include one Spanish example.",
-          "rubric": "correct: clearly explains the communication goal and gives a relevant Spanish example; mostly_correct: goal is clear but the Spanish has minor errors; incorrect: no clear goal, no Spanish example, or meaning is unrelated.",
+          "rubric": "correct: clearly explains the communication goal and gives a relevant Spanish example; mostly_correct: goal is clear but the Spanish has minor errors; mostly_wrong: some relevant idea but missing the Spanish example or mostly English; incorrect: no clear goal, no Spanish example, or meaning is unrelated.",
           "exemplar": "It helps me handle saying where people go. Example: ¿Vas a la escuela?"
         },
         {
           "q": "Write two new Spanish lines using at least three of these target words: voy, vas, va, vamos, van.",
-          "rubric": "correct: two understandable Spanish lines use at least three target words; mostly_correct: one line is strong or minor agreement/spelling errors remain; incorrect: mostly English, copied only, or target words are missing.",
+          "rubric": "correct: two understandable Spanish lines use at least three target words; mostly_correct: one line is strong or minor agreement/spelling errors remain; mostly_wrong: only fragments or one weak line with missing target words; incorrect: mostly English, copied only, or target words are missing.",
           "exemplar": "¿Vas a la escuela? Ella va al banco."
         },
         {
           "q": "For a real conversation, what would you say first, and what would you listen for in the reply?",
-          "rubric": "correct: gives a practical Spanish first line and a realistic listening target; mostly_correct: one part is specific and the other is vague; incorrect: answer does not prepare for an actual exchange.",
+          "rubric": "correct: gives a practical Spanish first line and a realistic listening target; mostly_correct: one part is specific and the other is vague; mostly_wrong: a related idea but not a usable first line or listening target; incorrect: answer does not prepare for an actual exchange.",
           "exemplar": "I would say: \"¿Vas a la escuela?\" I would listen for correct ir form."
         }
       ]
@@ -67,17 +67,17 @@
       "check": [
         {
           "q": "In English, what can today's model help you do? Include one Spanish example.",
-          "rubric": "correct: clearly explains the communication goal and gives a relevant Spanish example; mostly_correct: goal is clear but the Spanish has minor errors; incorrect: no clear goal, no Spanish example, or meaning is unrelated.",
+          "rubric": "correct: clearly explains the communication goal and gives a relevant Spanish example; mostly_correct: goal is clear but the Spanish has minor errors; mostly_wrong: some relevant idea but missing the Spanish example or mostly English; incorrect: no clear goal, no Spanish example, or meaning is unrelated.",
           "exemplar": "It helps me handle choosing al or a la. Example: Vamos a la biblioteca."
         },
         {
           "q": "Write two new Spanish lines using at least three of these target words: al, a la, a los, a las, mercado.",
-          "rubric": "correct: two understandable Spanish lines use at least three target words; mostly_correct: one line is strong or minor agreement/spelling errors remain; incorrect: mostly English, copied only, or target words are missing.",
+          "rubric": "correct: two understandable Spanish lines use at least three target words; mostly_correct: one line is strong or minor agreement/spelling errors remain; mostly_wrong: only fragments or one weak line with missing target words; incorrect: mostly English, copied only, or target words are missing.",
           "exemplar": "Vamos a la biblioteca. Van a las tiendas."
         },
         {
           "q": "For a real conversation, what would you say first, and what would you listen for in the reply?",
-          "rubric": "correct: gives a practical Spanish first line and a realistic listening target; mostly_correct: one part is specific and the other is vague; incorrect: answer does not prepare for an actual exchange.",
+          "rubric": "correct: gives a practical Spanish first line and a realistic listening target; mostly_correct: one part is specific and the other is vague; mostly_wrong: a related idea but not a usable first line or listening target; incorrect: answer does not prepare for an actual exchange.",
           "exemplar": "I would say: \"Vamos a la biblioteca.\" I would listen for place gender and contraction."
         }
       ]
@@ -93,17 +93,17 @@
       "check": [
         {
           "q": "In English, what can today's model help you do? Include one Spanish example.",
-          "rubric": "correct: clearly explains the communication goal and gives a relevant Spanish example; mostly_correct: goal is clear but the Spanish has minor errors; incorrect: no clear goal, no Spanish example, or meaning is unrelated.",
+          "rubric": "correct: clearly explains the communication goal and gives a relevant Spanish example; mostly_correct: goal is clear but the Spanish has minor errors; mostly_wrong: some relevant idea but missing the Spanish example or mostly English; incorrect: no clear goal, no Spanish example, or meaning is unrelated.",
           "exemplar": "It helps me handle describing how you travel. Example: Camino a la tienda."
         },
         {
           "q": "Write two new Spanish lines using at least three of these target words: camino, en bus, en carro, en tren, bicicleta.",
-          "rubric": "correct: two understandable Spanish lines use at least three target words; mostly_correct: one line is strong or minor agreement/spelling errors remain; incorrect: mostly English, copied only, or target words are missing.",
+          "rubric": "correct: two understandable Spanish lines use at least three target words; mostly_correct: one line is strong or minor agreement/spelling errors remain; mostly_wrong: only fragments or one weak line with missing target words; incorrect: mostly English, copied only, or target words are missing.",
           "exemplar": "Camino a la tienda. Vamos en taxi."
         },
         {
           "q": "For a real conversation, what would you say first, and what would you listen for in the reply?",
-          "rubric": "correct: gives a practical Spanish first line and a realistic listening target; mostly_correct: one part is specific and the other is vague; incorrect: answer does not prepare for an actual exchange.",
+          "rubric": "correct: gives a practical Spanish first line and a realistic listening target; mostly_correct: one part is specific and the other is vague; mostly_wrong: a related idea but not a usable first line or listening target; incorrect: answer does not prepare for an actual exchange.",
           "exemplar": "I would say: \"Camino a la tienda.\" I would listen for transport phrase plus place."
         }
       ]
@@ -119,17 +119,17 @@
       "check": [
         {
           "q": "In English, what can today's model help you do? Include one Spanish example.",
-          "rubric": "correct: clearly explains the communication goal and gives a relevant Spanish example; mostly_correct: goal is clear but the Spanish has minor errors; incorrect: no clear goal, no Spanish example, or meaning is unrelated.",
+          "rubric": "correct: clearly explains the communication goal and gives a relevant Spanish example; mostly_correct: goal is clear but the Spanish has minor errors; mostly_wrong: some relevant idea but missing the Spanish example or mostly English; incorrect: no clear goal, no Spanish example, or meaning is unrelated.",
           "exemplar": "It helps me handle asking destination and location. Example: ¿Dónde estás? Estoy aquí."
         },
         {
           "q": "Write two new Spanish lines using at least three of these target words: ¿adónde?, ¿dónde?, aquí, allá, cerca.",
-          "rubric": "correct: two understandable Spanish lines use at least three target words; mostly_correct: one line is strong or minor agreement/spelling errors remain; incorrect: mostly English, copied only, or target words are missing.",
+          "rubric": "correct: two understandable Spanish lines use at least three target words; mostly_correct: one line is strong or minor agreement/spelling errors remain; mostly_wrong: only fragments or one weak line with missing target words; incorrect: mostly English, copied only, or target words are missing.",
           "exemplar": "¿Dónde estás? Estoy aquí. La tienda está lejos."
         },
         {
           "q": "For a real conversation, what would you say first, and what would you listen for in the reply?",
-          "rubric": "correct: gives a practical Spanish first line and a realistic listening target; mostly_correct: one part is specific and the other is vague; incorrect: answer does not prepare for an actual exchange.",
+          "rubric": "correct: gives a practical Spanish first line and a realistic listening target; mostly_correct: one part is specific and the other is vague; mostly_wrong: a related idea but not a usable first line or listening target; incorrect: answer does not prepare for an actual exchange.",
           "exemplar": "I would say: \"¿Dónde estás? Estoy aquí.\" I would listen for difference between dónde and adónde."
         }
       ]
@@ -145,17 +145,17 @@
       "check": [
         {
           "q": "In English, what can today's model help you do? Include one Spanish example.",
-          "rubric": "correct: clearly explains the communication goal and gives a relevant Spanish example; mostly_correct: goal is clear but the Spanish has minor errors; incorrect: no clear goal, no Spanish example, or meaning is unrelated.",
+          "rubric": "correct: clearly explains the communication goal and gives a relevant Spanish example; mostly_correct: goal is clear but the Spanish has minor errors; mostly_wrong: some relevant idea but missing the Spanish example or mostly English; incorrect: no clear goal, no Spanish example, or meaning is unrelated.",
           "exemplar": "It helps me handle giving a reason for going. Example: Vamos al parque a descansar."
         },
         {
           "q": "Write two new Spanish lines using at least three of these target words: estudiar, comprar, comer, trabajar, visitar.",
-          "rubric": "correct: two understandable Spanish lines use at least three target words; mostly_correct: one line is strong or minor agreement/spelling errors remain; incorrect: mostly English, copied only, or target words are missing.",
+          "rubric": "correct: two understandable Spanish lines use at least three target words; mostly_correct: one line is strong or minor agreement/spelling errors remain; mostly_wrong: only fragments or one weak line with missing target words; incorrect: mostly English, copied only, or target words are missing.",
           "exemplar": "Vamos al parque a descansar. Ella va a la escuela a estudiar."
         },
         {
           "q": "For a real conversation, what would you say first, and what would you listen for in the reply?",
-          "rubric": "correct: gives a practical Spanish first line and a realistic listening target; mostly_correct: one part is specific and the other is vague; incorrect: answer does not prepare for an actual exchange.",
+          "rubric": "correct: gives a practical Spanish first line and a realistic listening target; mostly_correct: one part is specific and the other is vague; mostly_wrong: a related idea but not a usable first line or listening target; incorrect: answer does not prepare for an actual exchange.",
           "exemplar": "I would say: \"Vamos al parque a descansar.\" I would listen for place plus a purpose verb."
         }
       ]
@@ -171,17 +171,17 @@
       "check": [
         {
           "q": "In English, what can today's model help you do? Include one Spanish example.",
-          "rubric": "correct: clearly explains the communication goal and gives a relevant Spanish example; mostly_correct: goal is clear but the Spanish has minor errors; incorrect: no clear goal, no Spanish example, or meaning is unrelated.",
+          "rubric": "correct: clearly explains the communication goal and gives a relevant Spanish example; mostly_correct: goal is clear but the Spanish has minor errors; mostly_wrong: some relevant idea but missing the Spanish example or mostly English; incorrect: no clear goal, no Spanish example, or meaning is unrelated.",
           "exemplar": "It helps me handle describing a route. Example: Camino desde la escuela hasta el parque."
         },
         {
           "q": "Write two new Spanish lines using at least three of these target words: de, a, desde, hasta, casa.",
-          "rubric": "correct: two understandable Spanish lines use at least three target words; mostly_correct: one line is strong or minor agreement/spelling errors remain; incorrect: mostly English, copied only, or target words are missing.",
+          "rubric": "correct: two understandable Spanish lines use at least three target words; mostly_correct: one line is strong or minor agreement/spelling errors remain; mostly_wrong: only fragments or one weak line with missing target words; incorrect: mostly English, copied only, or target words are missing.",
           "exemplar": "Camino desde la escuela hasta el parque. Vengo de la tienda."
         },
         {
           "q": "For a real conversation, what would you say first, and what would you listen for in the reply?",
-          "rubric": "correct: gives a practical Spanish first line and a realistic listening target; mostly_correct: one part is specific and the other is vague; incorrect: answer does not prepare for an actual exchange.",
+          "rubric": "correct: gives a practical Spanish first line and a realistic listening target; mostly_correct: one part is specific and the other is vague; mostly_wrong: a related idea but not a usable first line or listening target; incorrect: answer does not prepare for an actual exchange.",
           "exemplar": "I would say: \"Camino desde la escuela hasta el parque.\" I would listen for start and end points."
         }
       ]
@@ -197,17 +197,17 @@
       "check": [
         {
           "q": "In English, what can today's model help you do? Include one Spanish example.",
-          "rubric": "correct: clearly explains the communication goal and gives a relevant Spanish example; mostly_correct: goal is clear but the Spanish has minor errors; incorrect: no clear goal, no Spanish example, or meaning is unrelated.",
+          "rubric": "correct: clearly explains the communication goal and gives a relevant Spanish example; mostly_correct: goal is clear but the Spanish has minor errors; mostly_wrong: some relevant idea but missing the Spanish example or mostly English; incorrect: no clear goal, no Spanish example, or meaning is unrelated.",
           "exemplar": "It helps me handle inviting someone out. Example: ¿Vienes conmigo?"
         },
         {
           "q": "Write two new Spanish lines using at least three of these target words: vamos, conmigo, contigo, hoy, mañana.",
-          "rubric": "correct: two understandable Spanish lines use at least three target words; mostly_correct: one line is strong or minor agreement/spelling errors remain; incorrect: mostly English, copied only, or target words are missing.",
+          "rubric": "correct: two understandable Spanish lines use at least three target words; mostly_correct: one line is strong or minor agreement/spelling errors remain; mostly_wrong: only fragments or one weak line with missing target words; incorrect: mostly English, copied only, or target words are missing.",
           "exemplar": "¿Vienes conmigo? Voy contigo a la tienda."
         },
         {
           "q": "For a real conversation, what would you say first, and what would you listen for in the reply?",
-          "rubric": "correct: gives a practical Spanish first line and a realistic listening target; mostly_correct: one part is specific and the other is vague; incorrect: answer does not prepare for an actual exchange.",
+          "rubric": "correct: gives a practical Spanish first line and a realistic listening target; mostly_correct: one part is specific and the other is vague; mostly_wrong: a related idea but not a usable first line or listening target; incorrect: answer does not prepare for an actual exchange.",
           "exemplar": "I would say: \"¿Vienes conmigo?\" I would listen for invitation and time word."
         }
       ]
@@ -223,17 +223,17 @@
       "check": [
         {
           "q": "In English, what can today's model help you do? Include one Spanish example.",
-          "rubric": "correct: clearly explains the communication goal and gives a relevant Spanish example; mostly_correct: goal is clear but the Spanish has minor errors; incorrect: no clear goal, no Spanish example, or meaning is unrelated.",
+          "rubric": "correct: clearly explains the communication goal and gives a relevant Spanish example; mostly_correct: goal is clear but the Spanish has minor errors; mostly_wrong: some relevant idea but missing the Spanish example or mostly English; incorrect: no clear goal, no Spanish example, or meaning is unrelated.",
           "exemplar": "It helps me handle giving or following directions. Example: La tienda está en la esquina."
         },
         {
           "q": "Write two new Spanish lines using at least three of these target words: derecha, izquierda, recto, calle, esquina.",
-          "rubric": "correct: two understandable Spanish lines use at least three target words; mostly_correct: one line is strong or minor agreement/spelling errors remain; incorrect: mostly English, copied only, or target words are missing.",
+          "rubric": "correct: two understandable Spanish lines use at least three target words; mostly_correct: one line is strong or minor agreement/spelling errors remain; mostly_wrong: only fragments or one weak line with missing target words; incorrect: mostly English, copied only, or target words are missing.",
           "exemplar": "La tienda está en la esquina. El banco está enfrente."
         },
         {
           "q": "For a real conversation, what would you say first, and what would you listen for in the reply?",
-          "rubric": "correct: gives a practical Spanish first line and a realistic listening target; mostly_correct: one part is specific and the other is vague; incorrect: answer does not prepare for an actual exchange.",
+          "rubric": "correct: gives a practical Spanish first line and a realistic listening target; mostly_correct: one part is specific and the other is vague; mostly_wrong: a related idea but not a usable first line or listening target; incorrect: answer does not prepare for an actual exchange.",
           "exemplar": "I would say: \"La tienda está en la esquina.\" I would listen for direction words."
         }
       ]
@@ -249,17 +249,17 @@
       "check": [
         {
           "q": "In English, what can today's model help you do? Include one Spanish example.",
-          "rubric": "correct: clearly explains the communication goal and gives a relevant Spanish example; mostly_correct: goal is clear but the Spanish has minor errors; incorrect: no clear goal, no Spanish example, or meaning is unrelated.",
+          "rubric": "correct: clearly explains the communication goal and gives a relevant Spanish example; mostly_correct: goal is clear but the Spanish has minor errors; mostly_wrong: some relevant idea but missing the Spanish example or mostly English; incorrect: no clear goal, no Spanish example, or meaning is unrelated.",
           "exemplar": "It helps me handle planning a weekend route. Example: Después vamos al parque a caminar."
         },
         {
           "q": "Write two new Spanish lines using at least three of these target words: sábado, domingo, voy, vamos, al.",
-          "rubric": "correct: two understandable Spanish lines use at least three target words; mostly_correct: one line is strong or minor agreement/spelling errors remain; incorrect: mostly English, copied only, or target words are missing.",
+          "rubric": "correct: two understandable Spanish lines use at least three target words; mostly_correct: one line is strong or minor agreement/spelling errors remain; mostly_wrong: only fragments or one weak line with missing target words; incorrect: mostly English, copied only, or target words are missing.",
           "exemplar": "Después vamos al parque a caminar. El domingo voy a la iglesia."
         },
         {
           "q": "For a real conversation, what would you say first, and what would you listen for in the reply?",
-          "rubric": "correct: gives a practical Spanish first line and a realistic listening target; mostly_correct: one part is specific and the other is vague; incorrect: answer does not prepare for an actual exchange.",
+          "rubric": "correct: gives a practical Spanish first line and a realistic listening target; mostly_correct: one part is specific and the other is vague; mostly_wrong: a related idea but not a usable first line or listening target; incorrect: answer does not prepare for an actual exchange.",
           "exemplar": "I would say: \"Después vamos al parque a caminar.\" I would listen for days, places, and reasons."
         }
       ]

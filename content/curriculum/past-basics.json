@@ -15,17 +15,17 @@
       "check": [
         {
           "q": "In English, what can today's model help you do? Include one Spanish example.",
-          "rubric": "correct: clearly explains the communication goal and gives a relevant Spanish example; mostly_correct: goal is clear but the Spanish has minor errors; incorrect: no clear goal, no Spanish example, or meaning is unrelated.",
+          "rubric": "correct: clearly explains the communication goal and gives a relevant Spanish example; mostly_correct: goal is clear but the Spanish has minor errors; mostly_wrong: some relevant idea but missing the Spanish example or mostly English; incorrect: no clear goal, no Spanish example, or meaning is unrelated.",
           "exemplar": "It helps me handle naming completed past actions. Example: Anoche fui al mercado."
         },
         {
           "q": "Write two new Spanish lines using at least three of these target words: ayer, anoche, la semana pasada, terminé, fui.",
-          "rubric": "correct: two understandable Spanish lines use at least three target words; mostly_correct: one line is strong or minor agreement/spelling errors remain; incorrect: mostly English, copied only, or target words are missing.",
+          "rubric": "correct: two understandable Spanish lines use at least three target words; mostly_correct: one line is strong or minor agreement/spelling errors remain; mostly_wrong: only fragments or one weak line with missing target words; incorrect: mostly English, copied only, or target words are missing.",
           "exemplar": "Anoche fui al mercado. La semana pasada hice comida."
         },
         {
           "q": "For a real conversation, what would you say first, and what would you listen for in the reply?",
-          "rubric": "correct: gives a practical Spanish first line and a realistic listening target; mostly_correct: one part is specific and the other is vague; incorrect: answer does not prepare for an actual exchange.",
+          "rubric": "correct: gives a practical Spanish first line and a realistic listening target; mostly_correct: one part is specific and the other is vague; mostly_wrong: a related idea but not a usable first line or listening target; incorrect: answer does not prepare for an actual exchange.",
           "exemplar": "I would say: \"Anoche fui al mercado.\" I would listen for past time marker."
         }
       ]
@@ -41,17 +41,17 @@
       "check": [
         {
           "q": "In English, what can today's model help you do? Include one Spanish example.",
-          "rubric": "correct: clearly explains the communication goal and gives a relevant Spanish example; mostly_correct: goal is clear but the Spanish has minor errors; incorrect: no clear goal, no Spanish example, or meaning is unrelated.",
+          "rubric": "correct: clearly explains the communication goal and gives a relevant Spanish example; mostly_correct: goal is clear but the Spanish has minor errors; mostly_wrong: some relevant idea but missing the Spanish example or mostly English; incorrect: no clear goal, no Spanish example, or meaning is unrelated.",
           "exemplar": "It helps me handle saying what you did yesterday. Example: Compré pan en la tienda."
         },
         {
           "q": "Write two new Spanish lines using at least three of these target words: hablé, estudié, trabajé, compré, caminé.",
-          "rubric": "correct: two understandable Spanish lines use at least three target words; mostly_correct: one line is strong or minor agreement/spelling errors remain; incorrect: mostly English, copied only, or target words are missing.",
+          "rubric": "correct: two understandable Spanish lines use at least three target words; mostly_correct: one line is strong or minor agreement/spelling errors remain; mostly_wrong: only fragments or one weak line with missing target words; incorrect: mostly English, copied only, or target words are missing.",
           "exemplar": "Compré pan en la tienda. Caminé al parque."
         },
         {
           "q": "For a real conversation, what would you say first, and what would you listen for in the reply?",
-          "rubric": "correct: gives a practical Spanish first line and a realistic listening target; mostly_correct: one part is specific and the other is vague; incorrect: answer does not prepare for an actual exchange.",
+          "rubric": "correct: gives a practical Spanish first line and a realistic listening target; mostly_correct: one part is specific and the other is vague; mostly_wrong: a related idea but not a usable first line or listening target; incorrect: answer does not prepare for an actual exchange.",
           "exemplar": "I would say: \"Compré pan en la tienda.\" I would listen for yo past verb ending in -é."
         }
       ]
@@ -67,17 +67,17 @@
       "check": [
         {
           "q": "In English, what can today's model help you do? Include one Spanish example.",
-          "rubric": "correct: clearly explains the communication goal and gives a relevant Spanish example; mostly_correct: goal is clear but the Spanish has minor errors; incorrect: no clear goal, no Spanish example, or meaning is unrelated.",
+          "rubric": "correct: clearly explains the communication goal and gives a relevant Spanish example; mostly_correct: goal is clear but the Spanish has minor errors; mostly_wrong: some relevant idea but missing the Spanish example or mostly English; incorrect: no clear goal, no Spanish example, or meaning is unrelated.",
           "exemplar": "It helps me handle reporting what someone did. Example: Mi padre compró café."
         },
         {
           "q": "Write two new Spanish lines using at least three of these target words: habló, estudió, trabajó, compró, caminó.",
-          "rubric": "correct: two understandable Spanish lines use at least three target words; mostly_correct: one line is strong or minor agreement/spelling errors remain; incorrect: mostly English, copied only, or target words are missing.",
+          "rubric": "correct: two understandable Spanish lines use at least three target words; mostly_correct: one line is strong or minor agreement/spelling errors remain; mostly_wrong: only fragments or one weak line with missing target words; incorrect: mostly English, copied only, or target words are missing.",
           "exemplar": "Mi padre compró café. Usted habló muy claro."
         },
         {
           "q": "For a real conversation, what would you say first, and what would you listen for in the reply?",
-          "rubric": "correct: gives a practical Spanish first line and a realistic listening target; mostly_correct: one part is specific and the other is vague; incorrect: answer does not prepare for an actual exchange.",
+          "rubric": "correct: gives a practical Spanish first line and a realistic listening target; mostly_correct: one part is specific and the other is vague; mostly_wrong: a related idea but not a usable first line or listening target; incorrect: answer does not prepare for an actual exchange.",
           "exemplar": "I would say: \"Mi padre compró café.\" I would listen for third-person past ending in -ó."
         }
       ]
@@ -93,17 +93,17 @@
       "check": [
         {
           "q": "In English, what can today's model help you do? Include one Spanish example.",
-          "rubric": "correct: clearly explains the communication goal and gives a relevant Spanish example; mostly_correct: goal is clear but the Spanish has minor errors; incorrect: no clear goal, no Spanish example, or meaning is unrelated.",
+          "rubric": "correct: clearly explains the communication goal and gives a relevant Spanish example; mostly_correct: goal is clear but the Spanish has minor errors; mostly_wrong: some relevant idea but missing the Spanish example or mostly English; incorrect: no clear goal, no Spanish example, or meaning is unrelated.",
           "exemplar": "It helps me handle using fui/fue for went or was. Example: La clase fue interesante."
         },
         {
           "q": "Write two new Spanish lines using at least three of these target words: fui, fuiste, fue, fuimos, ayer.",
-          "rubric": "correct: two understandable Spanish lines use at least three target words; mostly_correct: one line is strong or minor agreement/spelling errors remain; incorrect: mostly English, copied only, or target words are missing.",
+          "rubric": "correct: two understandable Spanish lines use at least three target words; mostly_correct: one line is strong or minor agreement/spelling errors remain; mostly_wrong: only fragments or one weak line with missing target words; incorrect: mostly English, copied only, or target words are missing.",
           "exemplar": "La clase fue interesante. Fuimos al parque."
         },
         {
           "q": "For a real conversation, what would you say first, and what would you listen for in the reply?",
-          "rubric": "correct: gives a practical Spanish first line and a realistic listening target; mostly_correct: one part is specific and the other is vague; incorrect: answer does not prepare for an actual exchange.",
+          "rubric": "correct: gives a practical Spanish first line and a realistic listening target; mostly_correct: one part is specific and the other is vague; mostly_wrong: a related idea but not a usable first line or listening target; incorrect: answer does not prepare for an actual exchange.",
           "exemplar": "I would say: \"La clase fue interesante.\" I would listen for context and place/description."
         }
       ]
@@ -119,17 +119,17 @@
       "check": [
         {
           "q": "In English, what can today's model help you do? Include one Spanish example.",
-          "rubric": "correct: clearly explains the communication goal and gives a relevant Spanish example; mostly_correct: goal is clear but the Spanish has minor errors; incorrect: no clear goal, no Spanish example, or meaning is unrelated.",
+          "rubric": "correct: clearly explains the communication goal and gives a relevant Spanish example; mostly_correct: goal is clear but the Spanish has minor errors; mostly_wrong: some relevant idea but missing the Spanish example or mostly English; incorrect: no clear goal, no Spanish example, or meaning is unrelated.",
           "exemplar": "It helps me handle saying what someone had. Example: Tuve un problema en la tienda."
         },
         {
           "q": "Write two new Spanish lines using at least three of these target words: tuve, tuviste, tuvo, problema, tiempo.",
-          "rubric": "correct: two understandable Spanish lines use at least three target words; mostly_correct: one line is strong or minor agreement/spelling errors remain; incorrect: mostly English, copied only, or target words are missing.",
+          "rubric": "correct: two understandable Spanish lines use at least three target words; mostly_correct: one line is strong or minor agreement/spelling errors remain; mostly_wrong: only fragments or one weak line with missing target words; incorrect: mostly English, copied only, or target words are missing.",
           "exemplar": "Tuve un problema en la tienda. Ella tuvo tiempo libre."
         },
         {
           "q": "For a real conversation, what would you say first, and what would you listen for in the reply?",
-          "rubric": "correct: gives a practical Spanish first line and a realistic listening target; mostly_correct: one part is specific and the other is vague; incorrect: answer does not prepare for an actual exchange.",
+          "rubric": "correct: gives a practical Spanish first line and a realistic listening target; mostly_correct: one part is specific and the other is vague; mostly_wrong: a related idea but not a usable first line or listening target; incorrect: answer does not prepare for an actual exchange.",
           "exemplar": "I would say: \"Tuve un problema en la tienda.\" I would listen for tuve/tuvo plus noun."
         }
       ]
@@ -145,17 +145,17 @@
       "check": [
         {
           "q": "In English, what can today's model help you do? Include one Spanish example.",
-          "rubric": "correct: clearly explains the communication goal and gives a relevant Spanish example; mostly_correct: goal is clear but the Spanish has minor errors; incorrect: no clear goal, no Spanish example, or meaning is unrelated.",
+          "rubric": "correct: clearly explains the communication goal and gives a relevant Spanish example; mostly_correct: goal is clear but the Spanish has minor errors; mostly_wrong: some relevant idea but missing the Spanish example or mostly English; incorrect: no clear goal, no Spanish example, or meaning is unrelated.",
           "exemplar": "It helps me handle talking about things made or done. Example: Mi mamá hizo comida."
         },
         {
           "q": "Write two new Spanish lines using at least three of these target words: hice, hiciste, hizo, tarea, comida.",
-          "rubric": "correct: two understandable Spanish lines use at least three target words; mostly_correct: one line is strong or minor agreement/spelling errors remain; incorrect: mostly English, copied only, or target words are missing.",
+          "rubric": "correct: two understandable Spanish lines use at least three target words; mostly_correct: one line is strong or minor agreement/spelling errors remain; mostly_wrong: only fragments or one weak line with missing target words; incorrect: mostly English, copied only, or target words are missing.",
           "exemplar": "Mi mamá hizo comida. ¿Qué hiciste ayer?"
         },
         {
           "q": "For a real conversation, what would you say first, and what would you listen for in the reply?",
-          "rubric": "correct: gives a practical Spanish first line and a realistic listening target; mostly_correct: one part is specific and the other is vague; incorrect: answer does not prepare for an actual exchange.",
+          "rubric": "correct: gives a practical Spanish first line and a realistic listening target; mostly_correct: one part is specific and the other is vague; mostly_wrong: a related idea but not a usable first line or listening target; incorrect: answer does not prepare for an actual exchange.",
           "exemplar": "I would say: \"Mi mamá hizo comida.\" I would listen for hacer past form."
         }
       ]
@@ -171,17 +171,17 @@
       "check": [
         {
           "q": "In English, what can today's model help you do? Include one Spanish example.",
-          "rubric": "correct: clearly explains the communication goal and gives a relevant Spanish example; mostly_correct: goal is clear but the Spanish has minor errors; incorrect: no clear goal, no Spanish example, or meaning is unrelated.",
+          "rubric": "correct: clearly explains the communication goal and gives a relevant Spanish example; mostly_correct: goal is clear but the Spanish has minor errors; mostly_wrong: some relevant idea but missing the Spanish example or mostly English; incorrect: no clear goal, no Spanish example, or meaning is unrelated.",
           "exemplar": "It helps me handle naming completed eating, drinking, or writing. Example: Bebí agua en la tarde."
         },
         {
           "q": "Write two new Spanish lines using at least three of these target words: comí, bebí, viví, escribí, aprendí.",
-          "rubric": "correct: two understandable Spanish lines use at least three target words; mostly_correct: one line is strong or minor agreement/spelling errors remain; incorrect: mostly English, copied only, or target words are missing.",
+          "rubric": "correct: two understandable Spanish lines use at least three target words; mostly_correct: one line is strong or minor agreement/spelling errors remain; mostly_wrong: only fragments or one weak line with missing target words; incorrect: mostly English, copied only, or target words are missing.",
           "exemplar": "Bebí agua en la tarde. Escribí cinco frases."
         },
         {
           "q": "For a real conversation, what would you say first, and what would you listen for in the reply?",
-          "rubric": "correct: gives a practical Spanish first line and a realistic listening target; mostly_correct: one part is specific and the other is vague; incorrect: answer does not prepare for an actual exchange.",
+          "rubric": "correct: gives a practical Spanish first line and a realistic listening target; mostly_correct: one part is specific and the other is vague; mostly_wrong: a related idea but not a usable first line or listening target; incorrect: answer does not prepare for an actual exchange.",
           "exemplar": "I would say: \"Bebí agua en la tarde.\" I would listen for yo past ending in -í."
         }
       ]
@@ -197,17 +197,17 @@
       "check": [
         {
           "q": "In English, what can today's model help you do? Include one Spanish example.",
-          "rubric": "correct: clearly explains the communication goal and gives a relevant Spanish example; mostly_correct: goal is clear but the Spanish has minor errors; incorrect: no clear goal, no Spanish example, or meaning is unrelated.",
+          "rubric": "correct: clearly explains the communication goal and gives a relevant Spanish example; mostly_correct: goal is clear but the Spanish has minor errors; mostly_wrong: some relevant idea but missing the Spanish example or mostly English; incorrect: no clear goal, no Spanish example, or meaning is unrelated.",
           "exemplar": "It helps me handle anchoring past events. Example: Anoche estudié en casa."
         },
         {
           "q": "Write two new Spanish lines using at least three of these target words: ayer, anoche, anteayer, el lunes, en la mañana.",
-          "rubric": "correct: two understandable Spanish lines use at least three target words; mostly_correct: one line is strong or minor agreement/spelling errors remain; incorrect: mostly English, copied only, or target words are missing.",
+          "rubric": "correct: two understandable Spanish lines use at least three target words; mostly_correct: one line is strong or minor agreement/spelling errors remain; mostly_wrong: only fragments or one weak line with missing target words; incorrect: mostly English, copied only, or target words are missing.",
           "exemplar": "Anoche estudié en casa. Después comí con mi familia."
         },
         {
           "q": "For a real conversation, what would you say first, and what would you listen for in the reply?",
-          "rubric": "correct: gives a practical Spanish first line and a realistic listening target; mostly_correct: one part is specific and the other is vague; incorrect: answer does not prepare for an actual exchange.",
+          "rubric": "correct: gives a practical Spanish first line and a realistic listening target; mostly_correct: one part is specific and the other is vague; mostly_wrong: a related idea but not a usable first line or listening target; incorrect: answer does not prepare for an actual exchange.",
           "exemplar": "I would say: \"Anoche estudié en casa.\" I would listen for time marker before or after action."
         }
       ]
@@ -223,17 +223,17 @@
       "check": [
         {
           "q": "In English, what can today's model help you do? Include one Spanish example.",
-          "rubric": "correct: clearly explains the communication goal and gives a relevant Spanish example; mostly_correct: goal is clear but the Spanish has minor errors; incorrect: no clear goal, no Spanish example, or meaning is unrelated.",
+          "rubric": "correct: clearly explains the communication goal and gives a relevant Spanish example; mostly_correct: goal is clear but the Spanish has minor errors; mostly_wrong: some relevant idea but missing the Spanish example or mostly English; incorrect: no clear goal, no Spanish example, or meaning is unrelated.",
           "exemplar": "It helps me handle asking and answering about yesterday. Example: ¿Adónde fuiste? Fui al mercado."
         },
         {
           "q": "Write two new Spanish lines using at least three of these target words: ¿qué hiciste?, ¿adónde fuiste?, ¿cuándo?, ¿con quién?, respondí.",
-          "rubric": "correct: two understandable Spanish lines use at least three target words; mostly_correct: one line is strong or minor agreement/spelling errors remain; incorrect: mostly English, copied only, or target words are missing.",
+          "rubric": "correct: two understandable Spanish lines use at least three target words; mostly_correct: one line is strong or minor agreement/spelling errors remain; mostly_wrong: only fragments or one weak line with missing target words; incorrect: mostly English, copied only, or target words are missing.",
           "exemplar": "¿Adónde fuiste? Fui al mercado. Pregunté y respondí en español."
         },
         {
           "q": "For a real conversation, what would you say first, and what would you listen for in the reply?",
-          "rubric": "correct: gives a practical Spanish first line and a realistic listening target; mostly_correct: one part is specific and the other is vague; incorrect: answer does not prepare for an actual exchange.",
+          "rubric": "correct: gives a practical Spanish first line and a realistic listening target; mostly_correct: one part is specific and the other is vague; mostly_wrong: a related idea but not a usable first line or listening target; incorrect: answer does not prepare for an actual exchange.",
           "exemplar": "I would say: \"¿Adónde fuiste? Fui al mercado.\" I would listen for question word and past verb."
         }
       ]
@@ -249,17 +249,17 @@
       "check": [
         {
           "q": "In English, what can today's model help you do? Include one Spanish example.",
-          "rubric": "correct: clearly explains the communication goal and gives a relevant Spanish example; mostly_correct: goal is clear but the Spanish has minor errors; incorrect: no clear goal, no Spanish example, or meaning is unrelated.",
+          "rubric": "correct: clearly explains the communication goal and gives a relevant Spanish example; mostly_correct: goal is clear but the Spanish has minor errors; mostly_wrong: some relevant idea but missing the Spanish example or mostly English; incorrect: no clear goal, no Spanish example, or meaning is unrelated.",
           "exemplar": "It helps me handle telling a short completed story. Example: Después comí con mi familia."
         },
         {
           "q": "Write two new Spanish lines using at least three of these target words: ayer, fui, compré, comí, hablé.",
-          "rubric": "correct: two understandable Spanish lines use at least three target words; mostly_correct: one line is strong or minor agreement/spelling errors remain; incorrect: mostly English, copied only, or target words are missing.",
+          "rubric": "correct: two understandable Spanish lines use at least three target words; mostly_correct: one line is strong or minor agreement/spelling errors remain; mostly_wrong: only fragments or one weak line with missing target words; incorrect: mostly English, copied only, or target words are missing.",
           "exemplar": "Después comí con mi familia. Hablé español con un amigo."
         },
         {
           "q": "For a real conversation, what would you say first, and what would you listen for in the reply?",
-          "rubric": "correct: gives a practical Spanish first line and a realistic listening target; mostly_correct: one part is specific and the other is vague; incorrect: answer does not prepare for an actual exchange.",
+          "rubric": "correct: gives a practical Spanish first line and a realistic listening target; mostly_correct: one part is specific and the other is vague; mostly_wrong: a related idea but not a usable first line or listening target; incorrect: answer does not prepare for an actual exchange.",
           "exemplar": "I would say: \"Después comí con mi familia.\" I would listen for ordered past actions."
         }
       ]

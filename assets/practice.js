@@ -21,7 +21,17 @@
   var REVIEW_QUESTIONS = 2; // bonus spaced-review checks from earlier days
   var TEST_SECONDS = 180; // max 3 minutes
   var TEST_MAX_QUESTIONS = 5;
-  var GRADE_POINTS = { correct: 100, mostly_correct: 60, incorrect: 0 };
+  var GRADE_POINTS = { correct: 100, mostly_correct: 80, mostly_wrong: 50, incorrect: 0 };
+
+  function emptyTallies() {
+    return { correct: 0, mostly_correct: 0, mostly_wrong: 0, incorrect: 0 };
+  }
+
+  function tallyGrades(grades) {
+    var tallies = emptyTallies();
+    (grades || []).forEach(function (g) { if (tallies[g] !== undefined) tallies[g]++; });
+    return tallies;
+  }
 
   /* v1 topic emphasis — remaps which subject feels "featured" without regenerating days. */
   var TOPIC_FOCUS = [
@@ -179,6 +189,9 @@
         functions: new Appwrite.Functions(client),
         databases: (window.APPWRITE && window.APPWRITE.databases) || new Appwrite.Databases(client)
       };
+      if (aw.client && typeof aw.client.setTimeout === "function") {
+        aw.client.setTimeout(45000);
+      }
     }
   } catch (e) {
     console.warn("[Practice] Appwrite SDK incompatible — continuing local-only.", e);
@@ -688,7 +701,7 @@
     }));
     kids.push(el("p", {
       class: "pa-muted pa-small",
-      text: "Scoring: correct 100% · mostly correct 60% · not correct 0%."
+      text: "Scoring: correct 100% · mostly correct 80% · mostly wrong 50% · not correct 0%."
     }));
 
     var list = el("div", { class: "pa-grade-list" });
@@ -703,6 +716,7 @@
             text: (row.date || "—") + " · " +
               (row.tallies.correct || 0) + " ✓ · " +
               (row.tallies.mostly_correct || 0) + " ~ · " +
+              (row.tallies.mostly_wrong || 0) + " ≈ · " +
               (row.tallies.incorrect || 0) + " ✗"
           })
         ]),
@@ -1251,13 +1265,50 @@
   function gradeLabel(grade) {
     if (grade === "correct") return "Correct";
     if (grade === "mostly_correct") return "Mostly correct";
+    if (grade === "mostly_wrong") return "Mostly wrong";
     return "Not correct";
   }
 
   function gradeClass(grade) {
     if (grade === "correct") return "pa-grade-correct";
     if (grade === "mostly_correct") return "pa-grade-mostly";
+    if (grade === "mostly_wrong") return "pa-grade-mostly-wrong";
     return "pa-grade-incorrect";
+  }
+
+  function executeFunction(payload) {
+    return aw.functions
+      .createExecution({
+        functionId: cfg.functionId,
+        body: JSON.stringify(payload),
+        xasync: false,
+        path: "/",
+        method: "POST",
+        headers: { "content-type": "application/json" }
+      })
+      .then(function (exec) {
+        var status = exec.responseStatusCode || exec.statusCode;
+        var raw = exec.responseBody || "";
+        var data;
+        try { data = JSON.parse(raw); } catch (e) {
+          throw new Error("AI returned an unreadable response.");
+        }
+        if (status && status >= 400) {
+          throw new Error(data.error || "Request failed (" + status + ").");
+        }
+        if (data.error) throw new Error(data.error);
+        return data;
+      });
+  }
+
+  function withRetry(run) {
+    return run().catch(function (err) {
+      var msg = String((err && err.message) || err || "");
+      if (/502|JSON|timeout|timed out|unreadable|Failed to generate|not return/i.test(msg)) {
+        return run();
+      }
+      throw err;
+    });
   }
 
   function callGradeFunction(payload) {
@@ -1268,29 +1319,12 @@
       return Promise.reject(new Error("Sign in to get AI feedback on your written answers."));
     }
     payload = Object.assign({ mode: "grade" }, payload || {});
-    return aw.functions
-      .createExecution({
-        functionId: cfg.functionId,
-        body: JSON.stringify(payload),
-        xasync: false,
-        path: "/",
-        method: "POST",
-        headers: { "content-type": "application/json" }
-      })
-      .then(function (exec) {
-        var status = exec.responseStatusCode || exec.statusCode;
-        var raw = exec.responseBody || "";
-        var data;
-        try { data = JSON.parse(raw); } catch (e) {
-          throw new Error("Grader returned an unreadable response.");
-        }
-        if (status && status >= 400) {
-          throw new Error(data.error || "Grading failed (" + status + ").");
-        }
-        if (data.error) throw new Error(data.error);
+    return withRetry(function () {
+      return executeFunction(payload).then(function (data) {
         if (!data.grade) throw new Error("Grader did not return a grade.");
         return data;
       });
+    });
   }
 
   function callTutorFunction(payload) {
@@ -1301,29 +1335,12 @@
       return Promise.reject(new Error("Sign in to use the Spanish tutor."));
     }
     payload = Object.assign({ mode: "tutor" }, payload || {});
-    return aw.functions
-      .createExecution({
-        functionId: cfg.functionId,
-        body: JSON.stringify(payload),
-        xasync: false,
-        path: "/",
-        method: "POST",
-        headers: { "content-type": "application/json" }
-      })
-      .then(function (exec) {
-        var status = exec.responseStatusCode || exec.statusCode;
-        var raw = exec.responseBody || "";
-        var data;
-        try { data = JSON.parse(raw); } catch (e) {
-          throw new Error("Tutor returned an unreadable response.");
-        }
-        if (status && status >= 400) {
-          throw new Error(data.error || "Tutor failed (" + status + ").");
-        }
-        if (data.error) throw new Error(data.error);
+    return withRetry(function () {
+      return executeFunction(payload).then(function (data) {
         if (!data.reply) throw new Error("Tutor did not return a reply.");
         return data;
       });
+    });
   }
 
   function bucketLabel(item) {
@@ -1360,7 +1377,7 @@
         class: "pa-muted pa-small",
         text: s.mode === "test"
           ? "Timed test — write briefly. Llama grades when you submit. / Prueba cronometrada — responde breve."
-          : "Write your answer in your own words. An open-source model (Llama via Groq) will grade it as correct, mostly correct, or not correct."
+          : "Write your answer in your own words. An open-source model (Llama via Groq) will grade it as correct (100%), mostly correct (80%), mostly wrong (50%), or not correct (0%)."
       })
     );
 
@@ -1401,7 +1418,7 @@
         text: gradeLabel(result.grade)
       }));
       feedbackBox.appendChild(el("p", {
-        class: "pa-explain " + (result.grade === "incorrect" ? "pa-explain-wrong" : "pa-explain-right"),
+        class: "pa-explain " + (result.grade === "incorrect" || result.grade === "mostly_wrong" ? "pa-explain-wrong" : "pa-explain-right"),
         text: result.feedback || ""
       }));
 
@@ -1487,8 +1504,7 @@
       state.completedDays.push(s.dayNumber);
       state.completedDays.sort(function (a, b) { return a - b; });
     }
-    var tallies = { correct: 0, mostly_correct: 0, incorrect: 0 };
-    (s.grades || []).forEach(function (g) { if (tallies[g] !== undefined) tallies[g]++; });
+    var tallies = tallyGrades(s.grades);
     var prev = state.log[s.dayNumber] || {};
     state.log[s.dayNumber] = {
       date: todayKey(),
@@ -1508,14 +1524,8 @@
     clearTestTimer();
     var s = session;
     if (!s || s.mode !== "test") return;
-    var tallies = { correct: 0, mostly_correct: 0, incorrect: 0 };
-    var answered = 0;
-    (s.grades || []).forEach(function (g) {
-      if (tallies[g] !== undefined) {
-        tallies[g]++;
-        answered++;
-      }
-    });
+    var tallies = tallyGrades(s.grades);
+    var answered = (s.grades || []).filter(function (g) { return GRADE_POINTS[g] !== undefined; }).length;
     var score = scoreFromGrades(s.grades);
     var record = {
       id: "t-" + Date.now() + "-" + Math.floor(Math.random() * 1000),
@@ -1538,17 +1548,17 @@
   function renderDone() {
     var s = session;
     var next = currentDay();
-    var tallies = { correct: 0, mostly_correct: 0, incorrect: 0 };
-    (s.grades || []).forEach(function (g) { if (tallies[g] !== undefined) tallies[g]++; });
+    var tallies = tallyGrades(s.grades);
     var score = scoreFromGrades(s.grades);
-    var summary = tallies.correct + " correct · " + tallies.mostly_correct + " mostly · " + tallies.incorrect + " not correct" +
+    var summary = tallies.correct + " correct · " + tallies.mostly_correct + " mostly correct · " +
+      tallies.mostly_wrong + " mostly wrong · " + tallies.incorrect + " not correct" +
       (score !== null ? " · " + score + "%" : "");
     var msg;
     if (s.isRetry) {
       msg = "Retry complete. Your plan is still on Day " + Math.min(next, GOAL) + " — this practice didn't change your progress.";
     } else if (next > GOAL) {
       msg = "That was the final session of the plan. Extraordinary work. You can retry any day from the subject list.";
-    } else if (tallies.incorrect === 0) {
+    } else if (tallies.incorrect === 0 && tallies.mostly_wrong === 0) {
       msg = "Solid checks. See you tomorrow for Day " + next + ".";
     } else {
       msg = "Session complete — use the feedback on the weaker answers tomorrow. Day " + next + " is next.";
@@ -1572,14 +1582,15 @@
   function renderTestDone() {
     var s = session;
     var record = s.lastTest || {};
-    var tallies = record.tallies || { correct: 0, mostly_correct: 0, incorrect: 0 };
+    var tallies = record.tallies || emptyTallies();
     viewRoot.appendChild(el("div", { class: "pa-card pa-done" }, [
       el("div", { class: "pa-done-mark", text: record.timedOut ? "⏱" : "\u2713" }),
       el("h3", { text: record.timedOut ? "Time's up — test saved" : "Practice test complete" }),
       el("p", {
         text: (record.score != null ? record.score + "% · " : "") +
           (tallies.correct || 0) + " correct · " +
-          (tallies.mostly_correct || 0) + " mostly · " +
+          (tallies.mostly_correct || 0) + " mostly correct · " +
+          (tallies.mostly_wrong || 0) + " mostly wrong · " +
           (tallies.incorrect || 0) + " not correct · " +
           (record.answered || 0) + "/" + (record.total || 0) + " answered"
       }),

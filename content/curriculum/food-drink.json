@@ -15,17 +15,17 @@
       "check": [
         {
           "q": "In English, what can today's model help you do? Include one Spanish example.",
-          "rubric": "correct: clearly explains the communication goal and gives a relevant Spanish example; mostly_correct: goal is clear but the Spanish has minor errors; incorrect: no clear goal, no Spanish example, or meaning is unrelated.",
+          "rubric": "correct: clearly explains the communication goal and gives a relevant Spanish example; mostly_correct: goal is clear but the Spanish has minor errors; mostly_wrong: some relevant idea but missing the Spanish example or mostly English; incorrect: no clear goal, no Spanish example, or meaning is unrelated.",
           "exemplar": "It helps me handle talking about meals today. Example: Como almuerzo a las doce."
         },
         {
           "q": "Write two new Spanish lines using at least three of these target words: desayuno, almuerzo, cena, comida, merienda.",
-          "rubric": "correct: two understandable Spanish lines use at least three target words; mostly_correct: one line is strong or minor agreement/spelling errors remain; incorrect: mostly English, copied only, or target words are missing.",
+          "rubric": "correct: two understandable Spanish lines use at least three target words; mostly_correct: one line is strong or minor agreement/spelling errors remain; mostly_wrong: only fragments or one weak line with missing target words; incorrect: mostly English, copied only, or target words are missing.",
           "exemplar": "Como almuerzo a las doce. La cena está lista."
         },
         {
           "q": "For a real conversation, what would you say first, and what would you listen for in the reply?",
-          "rubric": "correct: gives a practical Spanish first line and a realistic listening target; mostly_correct: one part is specific and the other is vague; incorrect: answer does not prepare for an actual exchange.",
+          "rubric": "correct: gives a practical Spanish first line and a realistic listening target; mostly_correct: one part is specific and the other is vague; mostly_wrong: a related idea but not a usable first line or listening target; incorrect: answer does not prepare for an actual exchange.",
           "exemplar": "I would say: \"Como almuerzo a las doce.\" I would listen for meal names and times."
         }
       ]
@@ -41,17 +41,17 @@
       "check": [
         {
           "q": "In English, what can today's model help you do? Include one Spanish example.",
-          "rubric": "correct: clearly explains the communication goal and gives a relevant Spanish example; mostly_correct: goal is clear but the Spanish has minor errors; incorrect: no clear goal, no Spanish example, or meaning is unrelated.",
+          "rubric": "correct: clearly explains the communication goal and gives a relevant Spanish example; mostly_correct: goal is clear but the Spanish has minor errors; mostly_wrong: some relevant idea but missing the Spanish example or mostly English; incorrect: no clear goal, no Spanish example, or meaning is unrelated.",
           "exemplar": "It helps me handle choosing fruit at a store. Example: Como banana por la mañana."
         },
         {
           "q": "Write two new Spanish lines using at least three of these target words: manzana, banana, naranja, uva, fresa.",
-          "rubric": "correct: two understandable Spanish lines use at least three target words; mostly_correct: one line is strong or minor agreement/spelling errors remain; incorrect: mostly English, copied only, or target words are missing.",
+          "rubric": "correct: two understandable Spanish lines use at least three target words; mostly_correct: one line is strong or minor agreement/spelling errors remain; mostly_wrong: only fragments or one weak line with missing target words; incorrect: mostly English, copied only, or target words are missing.",
           "exemplar": "Como banana por la mañana. El limón es amarillo."
         },
         {
           "q": "For a real conversation, what would you say first, and what would you listen for in the reply?",
-          "rubric": "correct: gives a practical Spanish first line and a realistic listening target; mostly_correct: one part is specific and the other is vague; incorrect: answer does not prepare for an actual exchange.",
+          "rubric": "correct: gives a practical Spanish first line and a realistic listening target; mostly_correct: one part is specific and the other is vague; mostly_wrong: a related idea but not a usable first line or listening target; incorrect: answer does not prepare for an actual exchange.",
           "exemplar": "I would say: \"Como banana por la mañana.\" I would listen for fruit names and quantity."
         }
       ]
@@ -67,17 +67,17 @@
       "check": [
         {
           "q": "In English, what can today's model help you do? Include one Spanish example.",
-          "rubric": "correct: clearly explains the communication goal and gives a relevant Spanish example; mostly_correct: goal is clear but the Spanish has minor errors; incorrect: no clear goal, no Spanish example, or meaning is unrelated.",
+          "rubric": "correct: clearly explains the communication goal and gives a relevant Spanish example; mostly_correct: goal is clear but the Spanish has minor errors; mostly_wrong: some relevant idea but missing the Spanish example or mostly English; incorrect: no clear goal, no Spanish example, or meaning is unrelated.",
           "exemplar": "It helps me handle planning a simple meal. Example: La sopa tiene zanahoria."
         },
         {
           "q": "Write two new Spanish lines using at least three of these target words: tomate, lechuga, cebolla, papa, zanahoria.",
-          "rubric": "correct: two understandable Spanish lines use at least three target words; mostly_correct: one line is strong or minor agreement/spelling errors remain; incorrect: mostly English, copied only, or target words are missing.",
+          "rubric": "correct: two understandable Spanish lines use at least three target words; mostly_correct: one line is strong or minor agreement/spelling errors remain; mostly_wrong: only fragments or one weak line with missing target words; incorrect: mostly English, copied only, or target words are missing.",
           "exemplar": "La sopa tiene zanahoria. Como papa con maíz."
         },
         {
           "q": "For a real conversation, what would you say first, and what would you listen for in the reply?",
-          "rubric": "correct: gives a practical Spanish first line and a realistic listening target; mostly_correct: one part is specific and the other is vague; incorrect: answer does not prepare for an actual exchange.",
+          "rubric": "correct: gives a practical Spanish first line and a realistic listening target; mostly_correct: one part is specific and the other is vague; mostly_wrong: a related idea but not a usable first line or listening target; incorrect: answer does not prepare for an actual exchange.",
           "exemplar": "I would say: \"La sopa tiene zanahoria.\" I would listen for vegetable names."
         }
       ]
@@ -93,17 +93,17 @@
       "check": [
         {
           "q": "In English, what can today's model help you do? Include one Spanish example.",
-          "rubric": "correct: clearly explains the communication goal and gives a relevant Spanish example; mostly_correct: goal is clear but the Spanish has minor errors; incorrect: no clear goal, no Spanish example, or meaning is unrelated.",
+          "rubric": "correct: clearly explains the communication goal and gives a relevant Spanish example; mostly_correct: goal is clear but the Spanish has minor errors; mostly_wrong: some relevant idea but missing the Spanish example or mostly English; incorrect: no clear goal, no Spanish example, or meaning is unrelated.",
           "exemplar": "It helps me handle asking for a drink politely. Example: Tomo café con leche."
         },
         {
           "q": "Write two new Spanish lines using at least three of these target words: agua, café, té, leche, jugo.",
-          "rubric": "correct: two understandable Spanish lines use at least three target words; mostly_correct: one line is strong or minor agreement/spelling errors remain; incorrect: mostly English, copied only, or target words are missing.",
+          "rubric": "correct: two understandable Spanish lines use at least three target words; mostly_correct: one line is strong or minor agreement/spelling errors remain; mostly_wrong: only fragments or one weak line with missing target words; incorrect: mostly English, copied only, or target words are missing.",
           "exemplar": "Tomo café con leche. El jugo es de naranja."
         },
         {
           "q": "For a real conversation, what would you say first, and what would you listen for in the reply?",
-          "rubric": "correct: gives a practical Spanish first line and a realistic listening target; mostly_correct: one part is specific and the other is vague; incorrect: answer does not prepare for an actual exchange.",
+          "rubric": "correct: gives a practical Spanish first line and a realistic listening target; mostly_correct: one part is specific and the other is vague; mostly_wrong: a related idea but not a usable first line or listening target; incorrect: answer does not prepare for an actual exchange.",
           "exemplar": "I would say: \"Tomo café con leche.\" I would listen for drink name and courtesy."
         }
       ]
@@ -119,17 +119,17 @@
       "check": [
         {
           "q": "In English, what can today's model help you do? Include one Spanish example.",
-          "rubric": "correct: clearly explains the communication goal and gives a relevant Spanish example; mostly_correct: goal is clear but the Spanish has minor errors; incorrect: no clear goal, no Spanish example, or meaning is unrelated.",
+          "rubric": "correct: clearly explains the communication goal and gives a relevant Spanish example; mostly_correct: goal is clear but the Spanish has minor errors; mostly_wrong: some relevant idea but missing the Spanish example or mostly English; incorrect: no clear goal, no Spanish example, or meaning is unrelated.",
           "exemplar": "It helps me handle ordering in a cafe. Example: Para mí, quiero agua."
         },
         {
           "q": "Write two new Spanish lines using at least three of these target words: quiero, quisiera, para mí, menú, cuenta.",
-          "rubric": "correct: two understandable Spanish lines use at least three target words; mostly_correct: one line is strong or minor agreement/spelling errors remain; incorrect: mostly English, copied only, or target words are missing.",
+          "rubric": "correct: two understandable Spanish lines use at least three target words; mostly_correct: one line is strong or minor agreement/spelling errors remain; mostly_wrong: only fragments or one weak line with missing target words; incorrect: mostly English, copied only, or target words are missing.",
           "exemplar": "Para mí, quiero agua. La cuenta, por favor."
         },
         {
           "q": "For a real conversation, what would you say first, and what would you listen for in the reply?",
-          "rubric": "correct: gives a practical Spanish first line and a realistic listening target; mostly_correct: one part is specific and the other is vague; incorrect: answer does not prepare for an actual exchange.",
+          "rubric": "correct: gives a practical Spanish first line and a realistic listening target; mostly_correct: one part is specific and the other is vague; mostly_wrong: a related idea but not a usable first line or listening target; incorrect: answer does not prepare for an actual exchange.",
           "exemplar": "I would say: \"Para mí, quiero agua.\" I would listen for polite request words."
         }
       ]
@@ -145,17 +145,17 @@
       "check": [
         {
           "q": "In English, what can today's model help you do? Include one Spanish example.",
-          "rubric": "correct: clearly explains the communication goal and gives a relevant Spanish example; mostly_correct: goal is clear but the Spanish has minor errors; incorrect: no clear goal, no Spanish example, or meaning is unrelated.",
+          "rubric": "correct: clearly explains the communication goal and gives a relevant Spanish example; mostly_correct: goal is clear but the Spanish has minor errors; mostly_wrong: some relevant idea but missing the Spanish example or mostly English; incorrect: no clear goal, no Spanish example, or meaning is unrelated.",
           "exemplar": "It helps me handle saying physical needs. Example: ¿Tienes hambre?"
         },
         {
           "q": "Write two new Spanish lines using at least three of these target words: hambre, sed, tengo, tienes, frío.",
-          "rubric": "correct: two understandable Spanish lines use at least three target words; mostly_correct: one line is strong or minor agreement/spelling errors remain; incorrect: mostly English, copied only, or target words are missing.",
+          "rubric": "correct: two understandable Spanish lines use at least three target words; mostly_correct: one line is strong or minor agreement/spelling errors remain; mostly_wrong: only fragments or one weak line with missing target words; incorrect: mostly English, copied only, or target words are missing.",
           "exemplar": "¿Tienes hambre? Ella tiene sed."
         },
         {
           "q": "For a real conversation, what would you say first, and what would you listen for in the reply?",
-          "rubric": "correct: gives a practical Spanish first line and a realistic listening target; mostly_correct: one part is specific and the other is vague; incorrect: answer does not prepare for an actual exchange.",
+          "rubric": "correct: gives a practical Spanish first line and a realistic listening target; mostly_correct: one part is specific and the other is vague; mostly_wrong: a related idea but not a usable first line or listening target; incorrect: answer does not prepare for an actual exchange.",
           "exemplar": "I would say: \"¿Tienes hambre?\" I would listen for tener plus a need."
         }
       ]
@@ -171,17 +171,17 @@
       "check": [
         {
           "q": "In English, what can today's model help you do? Include one Spanish example.",
-          "rubric": "correct: clearly explains the communication goal and gives a relevant Spanish example; mostly_correct: goal is clear but the Spanish has minor errors; incorrect: no clear goal, no Spanish example, or meaning is unrelated.",
+          "rubric": "correct: clearly explains the communication goal and gives a relevant Spanish example; mostly_correct: goal is clear but the Spanish has minor errors; mostly_wrong: some relevant idea but missing the Spanish example or mostly English; incorrect: no clear goal, no Spanish example, or meaning is unrelated.",
           "exemplar": "It helps me handle asking about food prices. Example: El café es caro."
         },
         {
           "q": "Write two new Spanish lines using at least three of these target words: cuesta, pesos, dólares, barato, caro.",
-          "rubric": "correct: two understandable Spanish lines use at least three target words; mostly_correct: one line is strong or minor agreement/spelling errors remain; incorrect: mostly English, copied only, or target words are missing.",
+          "rubric": "correct: two understandable Spanish lines use at least three target words; mostly_correct: one line is strong or minor agreement/spelling errors remain; mostly_wrong: only fragments or one weak line with missing target words; incorrect: mostly English, copied only, or target words are missing.",
           "exemplar": "El café es caro. El precio es barato."
         },
         {
           "q": "For a real conversation, what would you say first, and what would you listen for in the reply?",
-          "rubric": "correct: gives a practical Spanish first line and a realistic listening target; mostly_correct: one part is specific and the other is vague; incorrect: answer does not prepare for an actual exchange.",
+          "rubric": "correct: gives a practical Spanish first line and a realistic listening target; mostly_correct: one part is specific and the other is vague; mostly_wrong: a related idea but not a usable first line or listening target; incorrect: answer does not prepare for an actual exchange.",
           "exemplar": "I would say: \"El café es caro.\" I would listen for cost words and numbers."
         }
       ]
@@ -197,17 +197,17 @@
       "check": [
         {
           "q": "In English, what can today's model help you do? Include one Spanish example.",
-          "rubric": "correct: clearly explains the communication goal and gives a relevant Spanish example; mostly_correct: goal is clear but the Spanish has minor errors; incorrect: no clear goal, no Spanish example, or meaning is unrelated.",
+          "rubric": "correct: clearly explains the communication goal and gives a relevant Spanish example; mostly_correct: goal is clear but the Spanish has minor errors; mostly_wrong: some relevant idea but missing the Spanish example or mostly English; incorrect: no clear goal, no Spanish example, or meaning is unrelated.",
           "exemplar": "It helps me handle sharing food preferences. Example: No me gusta la sopa fría."
         },
         {
           "q": "Write two new Spanish lines using at least three of these target words: me gusta, no me gusta, te gusta, arroz, pollo.",
-          "rubric": "correct: two understandable Spanish lines use at least three target words; mostly_correct: one line is strong or minor agreement/spelling errors remain; incorrect: mostly English, copied only, or target words are missing.",
+          "rubric": "correct: two understandable Spanish lines use at least three target words; mostly_correct: one line is strong or minor agreement/spelling errors remain; mostly_wrong: only fragments or one weak line with missing target words; incorrect: mostly English, copied only, or target words are missing.",
           "exemplar": "No me gusta la sopa fría. ¿Te gusta el café?"
         },
         {
           "q": "For a real conversation, what would you say first, and what would you listen for in the reply?",
-          "rubric": "correct: gives a practical Spanish first line and a realistic listening target; mostly_correct: one part is specific and the other is vague; incorrect: answer does not prepare for an actual exchange.",
+          "rubric": "correct: gives a practical Spanish first line and a realistic listening target; mostly_correct: one part is specific and the other is vague; mostly_wrong: a related idea but not a usable first line or listening target; incorrect: answer does not prepare for an actual exchange.",
           "exemplar": "I would say: \"No me gusta la sopa fría.\" I would listen for gusta plus food."
         }
       ]
@@ -223,17 +223,17 @@
       "check": [
         {
           "q": "In English, what can today's model help you do? Include one Spanish example.",
-          "rubric": "correct: clearly explains the communication goal and gives a relevant Spanish example; mostly_correct: goal is clear but the Spanish has minor errors; incorrect: no clear goal, no Spanish example, or meaning is unrelated.",
+          "rubric": "correct: clearly explains the communication goal and gives a relevant Spanish example; mostly_correct: goal is clear but the Spanish has minor errors; mostly_wrong: some relevant idea but missing the Spanish example or mostly English; incorrect: no clear goal, no Spanish example, or meaning is unrelated.",
           "exemplar": "It helps me handle describing meal actions. Example: Preparo café por la mañana."
         },
         {
           "q": "Write two new Spanish lines using at least three of these target words: comer, beber, tomar, preparar, cocinar.",
-          "rubric": "correct: two understandable Spanish lines use at least three target words; mostly_correct: one line is strong or minor agreement/spelling errors remain; incorrect: mostly English, copied only, or target words are missing.",
+          "rubric": "correct: two understandable Spanish lines use at least three target words; mostly_correct: one line is strong or minor agreement/spelling errors remain; mostly_wrong: only fragments or one weak line with missing target words; incorrect: mostly English, copied only, or target words are missing.",
           "exemplar": "Preparo café por la mañana. Quiero probar la sopa."
         },
         {
           "q": "For a real conversation, what would you say first, and what would you listen for in the reply?",
-          "rubric": "correct: gives a practical Spanish first line and a realistic listening target; mostly_correct: one part is specific and the other is vague; incorrect: answer does not prepare for an actual exchange.",
+          "rubric": "correct: gives a practical Spanish first line and a realistic listening target; mostly_correct: one part is specific and the other is vague; mostly_wrong: a related idea but not a usable first line or listening target; incorrect: answer does not prepare for an actual exchange.",
           "exemplar": "I would say: \"Preparo café por la mañana.\" I would listen for verbs with food or drinks."
         }
       ]
@@ -249,17 +249,17 @@
       "check": [
         {
           "q": "In English, what can today's model help you do? Include one Spanish example.",
-          "rubric": "correct: clearly explains the communication goal and gives a relevant Spanish example; mostly_correct: goal is clear but the Spanish has minor errors; incorrect: no clear goal, no Spanish example, or meaning is unrelated.",
+          "rubric": "correct: clearly explains the communication goal and gives a relevant Spanish example; mostly_correct: goal is clear but the Spanish has minor errors; mostly_wrong: some relevant idea but missing the Spanish example or mostly English; incorrect: no clear goal, no Spanish example, or meaning is unrelated.",
           "exemplar": "It helps me handle writing a one-day menu. Example: Para el almuerzo necesito arroz."
         },
         {
           "q": "Write two new Spanish lines using at least three of these target words: desayuno, almuerzo, cena, quiero, me gusta.",
-          "rubric": "correct: two understandable Spanish lines use at least three target words; mostly_correct: one line is strong or minor agreement/spelling errors remain; incorrect: mostly English, copied only, or target words are missing.",
+          "rubric": "correct: two understandable Spanish lines use at least three target words; mostly_correct: one line is strong or minor agreement/spelling errors remain; mostly_wrong: only fragments or one weak line with missing target words; incorrect: mostly English, copied only, or target words are missing.",
           "exemplar": "Para el almuerzo necesito arroz. Me gusta cenar sopa."
         },
         {
           "q": "For a real conversation, what would you say first, and what would you listen for in the reply?",
-          "rubric": "correct: gives a practical Spanish first line and a realistic listening target; mostly_correct: one part is specific and the other is vague; incorrect: answer does not prepare for an actual exchange.",
+          "rubric": "correct: gives a practical Spanish first line and a realistic listening target; mostly_correct: one part is specific and the other is vague; mostly_wrong: a related idea but not a usable first line or listening target; incorrect: answer does not prepare for an actual exchange.",
           "exemplar": "I would say: \"Para el almuerzo necesito arroz.\" I would listen for meal plus food and drink."
         }
       ]

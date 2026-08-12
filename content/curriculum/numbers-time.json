@@ -15,17 +15,17 @@
       "check": [
         {
           "q": "In English, what can today's model help you do? Include one Spanish example.",
-          "rubric": "correct: clearly explains the communication goal and gives a relevant Spanish example; mostly_correct: goal is clear but the Spanish has minor errors; incorrect: no clear goal, no Spanish example, or meaning is unrelated.",
+          "rubric": "correct: clearly explains the communication goal and gives a relevant Spanish example; mostly_correct: goal is clear but the Spanish has minor errors; mostly_wrong: some relevant idea but missing the Spanish example or mostly English; incorrect: no clear goal, no Spanish example, or meaning is unrelated.",
           "exemplar": "It helps me handle counting small objects around you. Example: Hay cinco estudiantes."
         },
         {
           "q": "Write two new Spanish lines using at least three of these target words: cero, uno, dos, tres, cuatro.",
-          "rubric": "correct: two understandable Spanish lines use at least three target words; mostly_correct: one line is strong or minor agreement/spelling errors remain; incorrect: mostly English, copied only, or target words are missing.",
+          "rubric": "correct: two understandable Spanish lines use at least three target words; mostly_correct: one line is strong or minor agreement/spelling errors remain; mostly_wrong: only fragments or one weak line with missing target words; incorrect: mostly English, copied only, or target words are missing.",
           "exemplar": "Hay cinco estudiantes. Necesito tres minutos."
         },
         {
           "q": "For a real conversation, what would you say first, and what would you listen for in the reply?",
-          "rubric": "correct: gives a practical Spanish first line and a realistic listening target; mostly_correct: one part is specific and the other is vague; incorrect: answer does not prepare for an actual exchange.",
+          "rubric": "correct: gives a practical Spanish first line and a realistic listening target; mostly_correct: one part is specific and the other is vague; mostly_wrong: a related idea but not a usable first line or listening target; incorrect: answer does not prepare for an actual exchange.",
           "exemplar": "I would say: \"Hay cinco estudiantes.\" I would listen for numbers connected to real objects."
         }
       ]
@@ -41,17 +41,17 @@
       "check": [
         {
           "q": "In English, what can today's model help you do? Include one Spanish example.",
-          "rubric": "correct: clearly explains the communication goal and gives a relevant Spanish example; mostly_correct: goal is clear but the Spanish has minor errors; incorrect: no clear goal, no Spanish example, or meaning is unrelated.",
+          "rubric": "correct: clearly explains the communication goal and gives a relevant Spanish example; mostly_correct: goal is clear but the Spanish has minor errors; mostly_wrong: some relevant idea but missing the Spanish example or mostly English; incorrect: no clear goal, no Spanish example, or meaning is unrelated.",
           "exemplar": "It helps me handle saying ages, quantities, and small prices. Example: Hay doce sillas."
         },
         {
           "q": "Write two new Spanish lines using at least three of these target words: once, doce, trece, catorce, quince.",
-          "rubric": "correct: two understandable Spanish lines use at least three target words; mostly_correct: one line is strong or minor agreement/spelling errors remain; incorrect: mostly English, copied only, or target words are missing.",
+          "rubric": "correct: two understandable Spanish lines use at least three target words; mostly_correct: one line is strong or minor agreement/spelling errors remain; mostly_wrong: only fragments or one weak line with missing target words; incorrect: mostly English, copied only, or target words are missing.",
           "exemplar": "Hay doce sillas. Necesito veinte pesos."
         },
         {
           "q": "For a real conversation, what would you say first, and what would you listen for in the reply?",
-          "rubric": "correct: gives a practical Spanish first line and a realistic listening target; mostly_correct: one part is specific and the other is vague; incorrect: answer does not prepare for an actual exchange.",
+          "rubric": "correct: gives a practical Spanish first line and a realistic listening target; mostly_correct: one part is specific and the other is vague; mostly_wrong: a related idea but not a usable first line or listening target; incorrect: answer does not prepare for an actual exchange.",
           "exemplar": "I would say: \"Hay doce sillas.\" I would listen for a number from eleven to twenty."
         }
       ]
@@ -67,17 +67,17 @@
       "check": [
         {
           "q": "In English, what can today's model help you do? Include one Spanish example.",
-          "rubric": "correct: clearly explains the communication goal and gives a relevant Spanish example; mostly_correct: goal is clear but the Spanish has minor errors; incorrect: no clear goal, no Spanish example, or meaning is unrelated.",
+          "rubric": "correct: clearly explains the communication goal and gives a relevant Spanish example; mostly_correct: goal is clear but the Spanish has minor errors; mostly_wrong: some relevant idea but missing the Spanish example or mostly English; incorrect: no clear goal, no Spanish example, or meaning is unrelated.",
           "exemplar": "It helps me handle counting money, minutes, or addresses. Example: Tengo cuarenta libros en casa."
         },
         {
           "q": "Write two new Spanish lines using at least three of these target words: diez, veinte, treinta, cuarenta, cincuenta.",
-          "rubric": "correct: two understandable Spanish lines use at least three target words; mostly_correct: one line is strong or minor agreement/spelling errors remain; incorrect: mostly English, copied only, or target words are missing.",
+          "rubric": "correct: two understandable Spanish lines use at least three target words; mostly_correct: one line is strong or minor agreement/spelling errors remain; mostly_wrong: only fragments or one weak line with missing target words; incorrect: mostly English, copied only, or target words are missing.",
           "exemplar": "Tengo cuarenta libros en casa. La clase tiene cincuenta minutos."
         },
         {
           "q": "For a real conversation, what would you say first, and what would you listen for in the reply?",
-          "rubric": "correct: gives a practical Spanish first line and a realistic listening target; mostly_correct: one part is specific and the other is vague; incorrect: answer does not prepare for an actual exchange.",
+          "rubric": "correct: gives a practical Spanish first line and a realistic listening target; mostly_correct: one part is specific and the other is vague; mostly_wrong: a related idea but not a usable first line or listening target; incorrect: answer does not prepare for an actual exchange.",
           "exemplar": "I would say: \"Tengo cuarenta libros en casa.\" I would listen for tens and y combinations."
         }
       ]
@@ -93,17 +93,17 @@
       "check": [
         {
           "q": "In English, what can today's model help you do? Include one Spanish example.",
-          "rubric": "correct: clearly explains the communication goal and gives a relevant Spanish example; mostly_correct: goal is clear but the Spanish has minor errors; incorrect: no clear goal, no Spanish example, or meaning is unrelated.",
+          "rubric": "correct: clearly explains the communication goal and gives a relevant Spanish example; mostly_correct: goal is clear but the Spanish has minor errors; mostly_wrong: some relevant idea but missing the Spanish example or mostly English; incorrect: no clear goal, no Spanish example, or meaning is unrelated.",
           "exemplar": "It helps me handle giving contact information slowly. Example: Vivo en la calle ocho."
         },
         {
           "q": "Write two new Spanish lines using at least three of these target words: teléfono, número, calle, casa, apartamento.",
-          "rubric": "correct: two understandable Spanish lines use at least three target words; mostly_correct: one line is strong or minor agreement/spelling errors remain; incorrect: mostly English, copied only, or target words are missing.",
+          "rubric": "correct: two understandable Spanish lines use at least three target words; mostly_correct: one line is strong or minor agreement/spelling errors remain; mostly_wrong: only fragments or one weak line with missing target words; incorrect: mostly English, copied only, or target words are missing.",
           "exemplar": "Vivo en la calle ocho. El apartamento es quince."
         },
         {
           "q": "For a real conversation, what would you say first, and what would you listen for in the reply?",
-          "rubric": "correct: gives a practical Spanish first line and a realistic listening target; mostly_correct: one part is specific and the other is vague; incorrect: answer does not prepare for an actual exchange.",
+          "rubric": "correct: gives a practical Spanish first line and a realistic listening target; mostly_correct: one part is specific and the other is vague; mostly_wrong: a related idea but not a usable first line or listening target; incorrect: answer does not prepare for an actual exchange.",
           "exemplar": "I would say: \"Vivo en la calle ocho.\" I would listen for digits repeated in chunks."
         }
       ]
@@ -119,17 +119,17 @@
       "check": [
         {
           "q": "In English, what can today's model help you do? Include one Spanish example.",
-          "rubric": "correct: clearly explains the communication goal and gives a relevant Spanish example; mostly_correct: goal is clear but the Spanish has minor errors; incorrect: no clear goal, no Spanish example, or meaning is unrelated.",
+          "rubric": "correct: clearly explains the communication goal and gives a relevant Spanish example; mostly_correct: goal is clear but the Spanish has minor errors; mostly_wrong: some relevant idea but missing the Spanish example or mostly English; incorrect: no clear goal, no Spanish example, or meaning is unrelated.",
           "exemplar": "It helps me handle talking about a weekly schedule. Example: Trabajo el viernes."
         },
         {
           "q": "Write two new Spanish lines using at least three of these target words: lunes, martes, miércoles, jueves, viernes.",
-          "rubric": "correct: two understandable Spanish lines use at least three target words; mostly_correct: one line is strong or minor agreement/spelling errors remain; incorrect: mostly English, copied only, or target words are missing.",
+          "rubric": "correct: two understandable Spanish lines use at least three target words; mostly_correct: one line is strong or minor agreement/spelling errors remain; mostly_wrong: only fragments or one weak line with missing target words; incorrect: mostly English, copied only, or target words are missing.",
           "exemplar": "Trabajo el viernes. El domingo descanso."
         },
         {
           "q": "For a real conversation, what would you say first, and what would you listen for in the reply?",
-          "rubric": "correct: gives a practical Spanish first line and a realistic listening target; mostly_correct: one part is specific and the other is vague; incorrect: answer does not prepare for an actual exchange.",
+          "rubric": "correct: gives a practical Spanish first line and a realistic listening target; mostly_correct: one part is specific and the other is vague; mostly_wrong: a related idea but not a usable first line or listening target; incorrect: answer does not prepare for an actual exchange.",
           "exemplar": "I would say: \"Trabajo el viernes.\" I would listen for a day plus an activity."
         }
       ]
@@ -145,17 +145,17 @@
       "check": [
         {
           "q": "In English, what can today's model help you do? Include one Spanish example.",
-          "rubric": "correct: clearly explains the communication goal and gives a relevant Spanish example; mostly_correct: goal is clear but the Spanish has minor errors; incorrect: no clear goal, no Spanish example, or meaning is unrelated.",
+          "rubric": "correct: clearly explains the communication goal and gives a relevant Spanish example; mostly_correct: goal is clear but the Spanish has minor errors; mostly_wrong: some relevant idea but missing the Spanish example or mostly English; incorrect: no clear goal, no Spanish example, or meaning is unrelated.",
           "exemplar": "It helps me handle saying dates and birthdays. Example: Mi cumpleaños es el dos de abril."
         },
         {
           "q": "Write two new Spanish lines using at least three of these target words: enero, febrero, marzo, abril, mayo.",
-          "rubric": "correct: two understandable Spanish lines use at least three target words; mostly_correct: one line is strong or minor agreement/spelling errors remain; incorrect: mostly English, copied only, or target words are missing.",
+          "rubric": "correct: two understandable Spanish lines use at least three target words; mostly_correct: one line is strong or minor agreement/spelling errors remain; mostly_wrong: only fragments or one weak line with missing target words; incorrect: mostly English, copied only, or target words are missing.",
           "exemplar": "Mi cumpleaños es el dos de abril. La clase es en junio."
         },
         {
           "q": "For a real conversation, what would you say first, and what would you listen for in the reply?",
-          "rubric": "correct: gives a practical Spanish first line and a realistic listening target; mostly_correct: one part is specific and the other is vague; incorrect: answer does not prepare for an actual exchange.",
+          "rubric": "correct: gives a practical Spanish first line and a realistic listening target; mostly_correct: one part is specific and the other is vague; mostly_wrong: a related idea but not a usable first line or listening target; incorrect: answer does not prepare for an actual exchange.",
           "exemplar": "I would say: \"Mi cumpleaños es el dos de abril.\" I would listen for day number and month."
         }
       ]
@@ -171,17 +171,17 @@
       "check": [
         {
           "q": "In English, what can today's model help you do? Include one Spanish example.",
-          "rubric": "correct: clearly explains the communication goal and gives a relevant Spanish example; mostly_correct: goal is clear but the Spanish has minor errors; incorrect: no clear goal, no Spanish example, or meaning is unrelated.",
+          "rubric": "correct: clearly explains the communication goal and gives a relevant Spanish example; mostly_correct: goal is clear but the Spanish has minor errors; mostly_wrong: some relevant idea but missing the Spanish example or mostly English; incorrect: no clear goal, no Spanish example, or meaning is unrelated.",
           "exemplar": "It helps me handle asking or giving the time. Example: Es la una en punto."
         },
         {
           "q": "Write two new Spanish lines using at least three of these target words: hora, una, dos, media, cuarto.",
-          "rubric": "correct: two understandable Spanish lines use at least three target words; mostly_correct: one line is strong or minor agreement/spelling errors remain; incorrect: mostly English, copied only, or target words are missing.",
+          "rubric": "correct: two understandable Spanish lines use at least three target words; mostly_correct: one line is strong or minor agreement/spelling errors remain; mostly_wrong: only fragments or one weak line with missing target words; incorrect: mostly English, copied only, or target words are missing.",
           "exemplar": "Es la una en punto. La clase es a las tres."
         },
         {
           "q": "For a real conversation, what would you say first, and what would you listen for in the reply?",
-          "rubric": "correct: gives a practical Spanish first line and a realistic listening target; mostly_correct: one part is specific and the other is vague; incorrect: answer does not prepare for an actual exchange.",
+          "rubric": "correct: gives a practical Spanish first line and a realistic listening target; mostly_correct: one part is specific and the other is vague; mostly_wrong: a related idea but not a usable first line or listening target; incorrect: answer does not prepare for an actual exchange.",
           "exemplar": "I would say: \"Es la una en punto.\" I would listen for hour and minute words."
         }
       ]
@@ -197,17 +197,17 @@
       "check": [
         {
           "q": "In English, what can today's model help you do? Include one Spanish example.",
-          "rubric": "correct: clearly explains the communication goal and gives a relevant Spanish example; mostly_correct: goal is clear but the Spanish has minor errors; incorrect: no clear goal, no Spanish example, or meaning is unrelated.",
+          "rubric": "correct: clearly explains the communication goal and gives a relevant Spanish example; mostly_correct: goal is clear but the Spanish has minor errors; mostly_wrong: some relevant idea but missing the Spanish example or mostly English; incorrect: no clear goal, no Spanish example, or meaning is unrelated.",
           "exemplar": "It helps me handle placing activities in the day. Example: Trabajo en la tarde."
         },
         {
           "q": "Write two new Spanish lines using at least three of these target words: mañana, tarde, noche, mediodía, temprano.",
-          "rubric": "correct: two understandable Spanish lines use at least three target words; mostly_correct: one line is strong or minor agreement/spelling errors remain; incorrect: mostly English, copied only, or target words are missing.",
+          "rubric": "correct: two understandable Spanish lines use at least three target words; mostly_correct: one line is strong or minor agreement/spelling errors remain; mostly_wrong: only fragments or one weak line with missing target words; incorrect: mostly English, copied only, or target words are missing.",
           "exemplar": "Trabajo en la tarde. Duermo por la noche."
         },
         {
           "q": "For a real conversation, what would you say first, and what would you listen for in the reply?",
-          "rubric": "correct: gives a practical Spanish first line and a realistic listening target; mostly_correct: one part is specific and the other is vague; incorrect: answer does not prepare for an actual exchange.",
+          "rubric": "correct: gives a practical Spanish first line and a realistic listening target; mostly_correct: one part is specific and the other is vague; mostly_wrong: a related idea but not a usable first line or listening target; incorrect: answer does not prepare for an actual exchange.",
           "exemplar": "I would say: \"Trabajo en la tarde.\" I would listen for morning, afternoon, or night."
         }
       ]
@@ -223,17 +223,17 @@
       "check": [
         {
           "q": "In English, what can today's model help you do? Include one Spanish example.",
-          "rubric": "correct: clearly explains the communication goal and gives a relevant Spanish example; mostly_correct: goal is clear but the Spanish has minor errors; incorrect: no clear goal, no Spanish example, or meaning is unrelated.",
+          "rubric": "correct: clearly explains the communication goal and gives a relevant Spanish example; mostly_correct: goal is clear but the Spanish has minor errors; mostly_wrong: some relevant idea but missing the Spanish example or mostly English; incorrect: no clear goal, no Spanish example, or meaning is unrelated.",
           "exemplar": "It helps me handle sequencing a simple day. Example: Ahora estoy en casa."
         },
         {
           "q": "Write two new Spanish lines using at least three of these target words: hoy, mañana, ayer, ahora, después.",
-          "rubric": "correct: two understandable Spanish lines use at least three target words; mostly_correct: one line is strong or minor agreement/spelling errors remain; incorrect: mostly English, copied only, or target words are missing.",
+          "rubric": "correct: two understandable Spanish lines use at least three target words; mostly_correct: one line is strong or minor agreement/spelling errors remain; mostly_wrong: only fragments or one weak line with missing target words; incorrect: mostly English, copied only, or target words are missing.",
           "exemplar": "Ahora estoy en casa. Después hablo con mi amiga."
         },
         {
           "q": "For a real conversation, what would you say first, and what would you listen for in the reply?",
-          "rubric": "correct: gives a practical Spanish first line and a realistic listening target; mostly_correct: one part is specific and the other is vague; incorrect: answer does not prepare for an actual exchange.",
+          "rubric": "correct: gives a practical Spanish first line and a realistic listening target; mostly_correct: one part is specific and the other is vague; mostly_wrong: a related idea but not a usable first line or listening target; incorrect: answer does not prepare for an actual exchange.",
           "exemplar": "I would say: \"Ahora estoy en casa.\" I would listen for time markers that show order."
         }
       ]
@@ -249,17 +249,17 @@
       "check": [
         {
           "q": "In English, what can today's model help you do? Include one Spanish example.",
-          "rubric": "correct: clearly explains the communication goal and gives a relevant Spanish example; mostly_correct: goal is clear but the Spanish has minor errors; incorrect: no clear goal, no Spanish example, or meaning is unrelated.",
+          "rubric": "correct: clearly explains the communication goal and gives a relevant Spanish example; mostly_correct: goal is clear but the Spanish has minor errors; mostly_wrong: some relevant idea but missing the Spanish example or mostly English; incorrect: no clear goal, no Spanish example, or meaning is unrelated.",
           "exemplar": "It helps me handle writing a three-item weekly plan. Example: El viernes trabajo por la tarde."
         },
         {
           "q": "Write two new Spanish lines using at least three of these target words: clase, trabajo, cita, reunión, a las.",
-          "rubric": "correct: two understandable Spanish lines use at least three target words; mostly_correct: one line is strong or minor agreement/spelling errors remain; incorrect: mostly English, copied only, or target words are missing.",
+          "rubric": "correct: two understandable Spanish lines use at least three target words; mostly_correct: one line is strong or minor agreement/spelling errors remain; mostly_wrong: only fragments or one weak line with missing target words; incorrect: mostly English, copied only, or target words are missing.",
           "exemplar": "El viernes trabajo por la tarde. El sábado tengo una cita."
         },
         {
           "q": "For a real conversation, what would you say first, and what would you listen for in the reply?",
-          "rubric": "correct: gives a practical Spanish first line and a realistic listening target; mostly_correct: one part is specific and the other is vague; incorrect: answer does not prepare for an actual exchange.",
+          "rubric": "correct: gives a practical Spanish first line and a realistic listening target; mostly_correct: one part is specific and the other is vague; mostly_wrong: a related idea but not a usable first line or listening target; incorrect: answer does not prepare for an actual exchange.",
           "exemplar": "I would say: \"El viernes trabajo por la tarde.\" I would listen for day, time, and event."
         }
       ]

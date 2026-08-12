@@ -23,7 +23,7 @@ summary: Fifteen to twenty minutes a day — concept cue, Spanish task, written 
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/appwrite@26.2.0"></script>
-<script src="assets/appwrite-config.js?v=3"></script>
-<script src="assets/appwrite-client.js?v=3"></script>
-<script src="assets/curriculum.js?v=3"></script>
-<script src="assets/practice.js?v=3"></script>
+<script src="assets/appwrite-config.js?v=4"></script>
+<script src="assets/appwrite-client.js?v=4"></script>
+<script src="assets/curriculum.js?v=4"></script>
+<script src="assets/practice.js?v=4"></script>

@@ -273,6 +273,7 @@ def build_checks(src: dict) -> list[dict]:
             "rubric": (
                 "correct: clearly explains the communication goal and gives a relevant Spanish "
                 "example; mostly_correct: goal is clear but the Spanish has minor errors; "
+                "mostly_wrong: some relevant idea but missing the Spanish example or mostly English; "
                 "incorrect: no clear goal, no Spanish example, or meaning is unrelated."
             ),
             "exemplar": f"It helps me handle {src['scenario']}. Example: {src['sample']}",
@@ -282,6 +283,7 @@ def build_checks(src: dict) -> list[dict]:
             "rubric": (
                 "correct: two understandable Spanish lines use at least three target words; "
                 "mostly_correct: one line is strong or minor agreement/spelling errors remain; "
+                "mostly_wrong: only fragments or one weak line with missing target words; "
                 "incorrect: mostly English, copied only, or target words are missing."
             ),
             "exemplar": f"{src['sample']} {src['sample2']}",
@@ -290,8 +292,9 @@ def build_checks(src: dict) -> list[dict]:
             "q": "For a real conversation, what would you say first, and what would you listen for in the reply?",
             "rubric": (
                 "correct: gives a practical Spanish first line and a realistic listening target; "
-                "mostly_correct: one part is specific and the other is vague; incorrect: answer "
-                "does not prepare for an actual exchange."
+                "mostly_correct: one part is specific and the other is vague; "
+                "mostly_wrong: a related idea but not a usable first line or listening target; "
+                "incorrect: answer does not prepare for an actual exchange."
             ),
             "exemplar": f'I would say: "{src["sample"]}" I would listen for {src["listen"]}.',
         },

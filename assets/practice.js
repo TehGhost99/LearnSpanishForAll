@@ -19,6 +19,9 @@
   var GOAL = CUR.goalDays;
   var STORAGE_KEY = "learn-spanish-for-all-practice-v1";
   var REVIEW_QUESTIONS = 2; // bonus spaced-review checks from earlier days
+  var TEST_SECONDS = 180; // max 3 minutes
+  var TEST_MAX_QUESTIONS = 5;
+  var GRADE_POINTS = { correct: 100, mostly_correct: 60, incorrect: 0 };
 
   /* v1 topic emphasis — remaps which subject feels "featured" without regenerating days. */
   var TOPIC_FOCUS = [
@@ -33,7 +36,6 @@
   function normalizeCheck(q) {
     if (!q) return null;
     if (q.rubric && !q.choices) return q;
-    // Legacy multiple-choice → temporary open-ended bridge until curriculum is rewritten.
     if (q.choices && typeof q.answer === "number") {
       var right = q.choices[q.answer] || "";
       return {
@@ -67,7 +69,14 @@
   /* ---------------- state ---------------- */
 
   function newState() {
-    return { startedAt: null, completedDays: [], log: {}, topicFocus: "balanced", updatedAt: 0 };
+    return {
+      startedAt: null,
+      completedDays: [],
+      log: {},
+      testLog: [],
+      topicFocus: "balanced",
+      updatedAt: 0
+    };
   }
 
   function loadLocal() {
@@ -80,6 +89,8 @@
   }
 
   var state = loadLocal() || newState();
+  if (!state.testLog) state.testLog = [];
+  if (!state.topicFocus) state.topicFocus = "balanced";
 
   function mergeStates(a, b) {
     var days = {};
@@ -101,8 +112,22 @@
     Object.keys(older.log || {}).forEach(function (k) { merged.log[k] = older.log[k]; });
     Object.keys(newer.log || {}).forEach(function (k) { merged.log[k] = newer.log[k]; });
     merged.topicFocus = newer.topicFocus || older.topicFocus || "balanced";
+    merged.testLog = mergeTestLogs(older.testLog || [], newer.testLog || []);
     merged.updatedAt = Math.max(a.updatedAt || 0, b.updatedAt || 0);
     return merged;
+  }
+
+  function mergeTestLogs(a, b) {
+    var map = {};
+    a.concat(b).forEach(function (t) {
+      if (!t || !t.id) return;
+      var prev = map[t.id];
+      if (!prev || (t.at || 0) >= (prev.at || 0)) map[t.id] = t;
+    });
+    return Object.keys(map)
+      .map(function (k) { return map[k]; })
+      .sort(function (x, y) { return (y.at || 0) - (x.at || 0); })
+      .slice(0, 60);
   }
 
   function save() {
@@ -116,12 +141,20 @@
   /* ---------------- appwrite ---------------- */
 
   var cfg = window.APPWRITE_CONFIG || null;
-  var aw = null;      // { account, tables }
-  var user = null;    // Appwrite user object when signed in
-  var syncMsg = "";   // short human-readable sync status
-  var authView = "login"; // login | forgot | forgot-sent | reset | reset-done
+  var aw = null;
+  var user = null;
+  var syncMsg = "";
+  var authView = "login";
   var recoveryUserId = null;
   var recoverySecret = null;
+  var viewRoot = root;
+  var calCursor = new Date();
+  calCursor.setDate(1);
+  calCursor.setHours(0, 0, 0, 0);
+  var tutorMessages = [];
+  var tutorBusy = false;
+  var tutorDraft = "";
+  var testTimerId = null;
 
   try {
     var recoveryParams = new URLSearchParams(window.location.search);
@@ -134,9 +167,6 @@
     }
   } catch (e) { /* ignore bad URL */ }
 
-  // Prefer the shared client from assets/appwrite-client.js (runs client.ping() on load).
-  // Wrapped in try/catch so an incompatible/missing SDK degrades to local-only
-  // mode instead of crashing the whole app before it renders.
   try {
     if (cfg && window.Appwrite) {
       var client =
@@ -178,13 +208,13 @@
         try { remote = JSON.parse(row.data); } catch (e) { remote = null; }
         if (remote) {
           state = mergeStates(state, remote);
+          if (!state.testLog) state.testLog = [];
           try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) {}
         }
         syncMsg = "Progress synced.";
       })
       .catch(function (err) {
         if (err && err.code === 404) {
-          // First device for this account - create the row from local state.
           return createCloudRow();
         }
         syncMsg = "Couldn't load cloud progress: " + (err.message || err);
@@ -251,7 +281,6 @@
   }
 
   function currentDay() {
-    // First incomplete day in plan order (handles gaps if any).
     var done = {};
     (state.completedDays || []).forEach(function (d) { done[d] = true; });
     for (var i = 1; i <= GOAL; i++) {
@@ -265,24 +294,36 @@
   }
 
   function todayKey() {
-    var d = new Date();
+    return dateKey(new Date());
+  }
+
+  function dateKey(d) {
     return d.getFullYear() + "-" +
       String(d.getMonth() + 1).padStart(2, "0") + "-" +
       String(d.getDate()).padStart(2, "0");
   }
 
+  function parseDateKey(key) {
+    var parts = String(key || "").split("-");
+    if (parts.length !== 3) return null;
+    var d = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+    return isNaN(d.getTime()) ? null : d;
+  }
+
+  function daysBetween(aKey, bKey) {
+    var a = parseDateKey(aKey);
+    var b = parseDateKey(bKey);
+    if (!a || !b) return null;
+    return Math.round((b.getTime() - a.getTime()) / 86400000);
+  }
+
   function streak() {
-    var dates = {};
-    Object.keys(state.log).forEach(function (k) {
-      if (state.log[k] && state.log[k].date) dates[state.log[k].date] = true;
-    });
+    var dates = practicedDateSet();
     var count = 0;
     var cursor = new Date();
-    if (!dates[todayKey()]) cursor.setDate(cursor.getDate() - 1); // streak survives until today ends
+    if (!dates[todayKey()]) cursor.setDate(cursor.getDate() - 1);
     for (;;) {
-      var key = cursor.getFullYear() + "-" +
-        String(cursor.getMonth() + 1).padStart(2, "0") + "-" +
-        String(cursor.getDate()).padStart(2, "0");
+      var key = dateKey(cursor);
       if (!dates[key]) break;
       count++;
       cursor.setDate(cursor.getDate() - 1);
@@ -290,14 +331,24 @@
     return count;
   }
 
+  function practicedDateSet() {
+    var dates = {};
+    Object.keys(state.log || {}).forEach(function (k) {
+      if (state.log[k] && state.log[k].date) dates[state.log[k].date] = true;
+    });
+    (state.testLog || []).forEach(function (t) {
+      if (t && t.date) dates[t.date] = true;
+    });
+    return dates;
+  }
+
   function reviewQuestions(beforeDay) {
-    // Bonus spaced-review checks drawn from earlier, already-covered days.
     var pool = [];
     for (var d = 1; d < beforeDay; d++) {
       var e = dayEntry(d);
       if (!e) continue;
       (e.day.check || []).forEach(function (q) {
-        pool.push({ q: q, from: e.subject.title });
+        pool.push({ q: q, from: e.subject.title, bucket: null, planDay: d });
       });
     }
     var picked = [];
@@ -305,6 +356,133 @@
       picked.push(pool.splice(Math.floor(Math.random() * pool.length), 1)[0]);
     }
     return picked;
+  }
+
+  function scoreFromGrades(grades) {
+    var list = (grades || []).filter(function (g) { return GRADE_POINTS[g] !== undefined; });
+    if (!list.length) return null;
+    var sum = 0;
+    list.forEach(function (g) { sum += GRADE_POINTS[g]; });
+    return Math.round(sum / list.length);
+  }
+
+  function overallGradeSummary() {
+    var rows = [];
+    Object.keys(state.log || {}).forEach(function (k) {
+      var entry = state.log[k];
+      if (!entry || !entry.grades) return;
+      var score = scoreFromGrades(entry.grades);
+      if (score === null) return;
+      rows.push({
+        day: Number(k),
+        date: entry.date || "",
+        score: score,
+        tallies: entry.tallies || {},
+        total: entry.total || entry.grades.length
+      });
+    });
+    rows.sort(function (a, b) { return a.day - b.day; });
+    var overall = null;
+    if (rows.length) {
+      var sum = 0;
+      rows.forEach(function (r) { sum += r.score; });
+      overall = Math.round(sum / rows.length);
+    }
+    return { rows: rows, overall: overall };
+  }
+
+  /* Spaced buckets: material completed ~1 day, ~7 days, ~30 days ago. */
+  function spacedBucketPools() {
+    var today = todayKey();
+    var buckets = {
+      day: { label: "1 day prior / 1 día antes", target: 1, items: [] },
+      week: { label: "1 week prior / 1 semana antes", target: 7, items: [] },
+      month: { label: "1 month prior / 1 mes antes", target: 30, items: [] }
+    };
+    Object.keys(state.log || {}).forEach(function (k) {
+      var entry = state.log[k];
+      if (!entry || !entry.date) return;
+      var age = daysBetween(entry.date, today);
+      if (age === null || age < 1) return;
+      var planDay = Number(k);
+      var e = dayEntry(planDay);
+      if (!e) return;
+      var checks = (e.day.check || []).map(function (q) {
+        return { q: q, from: e.subject.title, planDay: planDay, age: age };
+      });
+      if (!checks.length) return;
+      // Prefer exact targets; allow nearby windows so sparse calendars still work.
+      if (age >= 1 && age <= 2) {
+        checks.forEach(function (c) { buckets.day.items.push(Object.assign({}, c, { bucket: "day" })); });
+      }
+      if (age >= 5 && age <= 9) {
+        checks.forEach(function (c) { buckets.week.items.push(Object.assign({}, c, { bucket: "week" })); });
+      }
+      if (age >= 25 && age <= 35) {
+        checks.forEach(function (c) { buckets.month.items.push(Object.assign({}, c, { bucket: "month" })); });
+      }
+    });
+    return buckets;
+  }
+
+  function pickFromPool(pool, n) {
+    var copy = pool.slice();
+    var out = [];
+    while (out.length < n && copy.length) {
+      out.push(copy.splice(Math.floor(Math.random() * copy.length), 1)[0]);
+    }
+    return out;
+  }
+
+  function buildPracticeTestQuestions() {
+    var buckets = spacedBucketPools();
+    var picked = [];
+    ["day", "week", "month"].forEach(function (key) {
+      pickFromPool(buckets[key].items, 2).forEach(function (item) {
+        if (picked.length < TEST_MAX_QUESTIONS) picked.push(item);
+      });
+    });
+    // If a bucket is empty, fill from any completed prior material so the test still runs.
+    if (picked.length < 3) {
+      var fallback = [];
+      Object.keys(state.log || {}).forEach(function (k) {
+        var planDay = Number(k);
+        var e = dayEntry(planDay);
+        if (!e) return;
+        (e.day.check || []).forEach(function (q) {
+          fallback.push({
+            q: q,
+            from: e.subject.title,
+            planDay: planDay,
+            bucket: "review",
+            age: daysBetween(state.log[k].date, todayKey())
+          });
+        });
+      });
+      pickFromPool(fallback, TEST_MAX_QUESTIONS - picked.length).forEach(function (item) {
+        picked.push(item);
+      });
+    }
+    // De-dupe by question text
+    var seen = {};
+    return picked.filter(function (item) {
+      var key = (item.q && item.q.q) || "";
+      if (!key || seen[key]) return false;
+      seen[key] = true;
+      return true;
+    }).slice(0, TEST_MAX_QUESTIONS);
+  }
+
+  function practiceTestAvailability() {
+    var buckets = spacedBucketPools();
+    var completed = (state.completedDays || []).length;
+    return {
+      buckets: buckets,
+      canStart: completed >= 1,
+      dayCount: buckets.day.items.length,
+      weekCount: buckets.week.items.length,
+      monthCount: buckets.month.items.length
+    };
   }
 
   /* ---------------- tiny DOM helper ---------------- */
@@ -316,6 +494,7 @@
         if (k === "text") node.textContent = attrs[k];
         else if (k === "html") node.innerHTML = attrs[k];
         else if (k === "onclick") node.addEventListener("click", attrs[k]);
+        else if (k === "onchange") node.addEventListener("change", attrs[k]);
         else node.setAttribute(k, attrs[k]);
       });
     }
@@ -324,7 +503,6 @@
   }
 
   function emphasize(text) {
-    // Minimal, safe *emphasis* support for review prose.
     var span = document.createElement("span");
     text.split(/(\*[^*]+\*)/g).forEach(function (part) {
       if (part.length > 2 && part[0] === "*" && part[part.length - 1] === "*") {
@@ -340,13 +518,28 @@
 
   /* ---------------- views ---------------- */
 
-  var session = null; // active session data, null when on dashboard
+  var session = null;
+
+  function clearTestTimer() {
+    if (testTimerId) {
+      clearInterval(testTimerId);
+      testTimerId = null;
+    }
+  }
 
   function render() {
     root.innerHTML = "";
+    var shell = el("div", { class: "pa-shell" });
+    viewRoot = el("div", { class: "pa-main" });
+    var tutorHost = el("aside", { class: "pa-tutor-host", "aria-label": "Spanish tutor" });
+    shell.appendChild(viewRoot);
+    shell.appendChild(tutorHost);
+    root.appendChild(shell);
+
     if (session) renderSession();
     else renderDashboard();
-    root.appendChild(renderAccountPanel());
+    viewRoot.appendChild(renderAccountPanel());
+    renderTutor(tutorHost);
   }
 
   function renderSyncLine() {
@@ -359,6 +552,15 @@
     var day = currentDay();
     var pct = Math.min(100, Math.round((done / GOAL) * 100));
     if (!state.topicFocus) state.topicFocus = "balanced";
+    var gradeSummary = overallGradeSummary();
+
+    var headerStats = [
+      stat(done, "sessions / sesiones"),
+      stat(streak(), "day streak / racha")
+    ];
+    if (gradeSummary.overall !== null) {
+      headerStats.push(stat(gradeSummary.overall + "%", "overall grade / nota"));
+    }
 
     var header = el("div", { class: "pa-card pa-dash" }, [
       el("div", { class: "pa-dash-top" }, [
@@ -366,21 +568,21 @@
           el("div", { class: "pa-kicker", text: done >= GOAL ? "Plan complete / Plan completo" : "Day " + day + " of " + GOAL + " · Día " + day + " de " + GOAL }),
           el("div", { class: "pa-big", text: done >= GOAL ? "You did it. / Lo lograste." : (dayEntry(day) ? dayEntry(day).subject.title : "") })
         ]),
-        el("div", { class: "pa-stats" }, [
-          stat(done, "sessions / sesiones"),
-          stat(streak(), "day streak / racha")
-        ])
+        el("div", { class: "pa-stats" }, headerStats)
       ]),
       el("div", { class: "pa-bar" }, [el("div", { class: "pa-bar-fill", style: "width:" + pct + "%" })]),
       el("div", { class: "pa-bar-label", text: pct + "% of the flexible plan · del plan flexible" }),
       el("p", { class: "pa-small pa-muted", id: "pa-ping-line", text: pingMsg })
     ]);
 
-    root.appendChild(header);
-    root.appendChild(renderTopicFocus());
+    viewRoot.appendChild(header);
+    viewRoot.appendChild(renderTopicFocus());
+    viewRoot.appendChild(renderPracticeTestCard());
+    viewRoot.appendChild(renderGradesOverview(gradeSummary));
+    viewRoot.appendChild(renderPracticeCalendar());
 
     if (done >= GOAL) {
-      root.appendChild(el("div", { class: "pa-card pa-notice" }, [
+      viewRoot.appendChild(el("div", { class: "pa-card pa-notice" }, [
         el("p", { text: "All " + GOAL + " sessions are complete. Retry any day below anytime. / Las " + GOAL + " sesiones están hechas. Puedes repetir cualquier día abajo." })
       ]));
     } else {
@@ -402,10 +604,220 @@
           ? el("p", { class: "pa-muted pa-small", text: "You already finished a session today. Another advances the plan; retries below do not. / Ya terminaste hoy. Otra sesión avanza el plan; reintentar abajo no." })
           : null
       ]);
-      root.appendChild(cta);
+      viewRoot.appendChild(cta);
     }
 
-    root.appendChild(renderSubjectGrid());
+    viewRoot.appendChild(renderSubjectGrid());
+  }
+
+  function renderPracticeTestCard() {
+    var avail = practiceTestAvailability();
+    var kids = [
+      el("div", { class: "pa-kicker", text: "Spaced practice test · ≤ 3 min / Prueba espaciada" }),
+      el("h3", { text: "Quick check of what stuck" }),
+      el("p", {
+        class: "pa-small pa-muted",
+        text: "Pulls checks from material you finished about a day, a week, and a month ago — the same spacing idea from the course. Does not move your day plan. / Usa lo hecho ~1 día, ~1 semana y ~1 mes atrás. No mueve tu plan."
+      }),
+      el("div", { class: "pa-bucket-row" }, [
+        bucketChip("Day / Día", avail.dayCount),
+        bucketChip("Week / Semana", avail.weekCount),
+        bucketChip("Month / Mes", avail.monthCount)
+      ])
+    ];
+
+    if (!avail.canStart) {
+      kids.push(el("p", {
+        class: "pa-muted pa-small",
+        text: "Complete at least one practice day first. / Completa al menos un día de práctica primero."
+      }));
+    } else {
+      kids.push(el("button", {
+        class: "pa-btn pa-btn-primary",
+        text: "Start 3-minute test · Empezar prueba",
+        onclick: function () { startPracticeTest(); }
+      }));
+      if (!avail.dayCount && !avail.weekCount && !avail.monthCount) {
+        kids.push(el("p", {
+          class: "pa-muted pa-small",
+          text: "Exact day/week/month windows are empty right now — the test will review any completed material. / Las ventanas exactas están vacías; la prueba repasará material ya hecho."
+        }));
+      }
+    }
+
+    var recent = (state.testLog || []).slice(0, 3);
+    if (recent.length) {
+      kids.push(el("div", { class: "pa-test-recent" }, [
+        el("div", { class: "pa-small pa-muted", text: "Recent tests / Pruebas recientes" })
+      ].concat(recent.map(function (t) {
+        return el("div", {
+          class: "pa-test-recent-row",
+          text: (t.date || "") + " · " + (t.score != null ? t.score + "%" : "—") +
+            " · " + (t.answered || 0) + "/" + (t.total || 0) + " answered"
+        });
+      }))));
+    }
+
+    return el("div", { class: "pa-card pa-test-card" }, kids);
+  }
+
+  function bucketChip(label, count) {
+    return el("div", { class: "pa-bucket-chip" + (count ? " pa-bucket-ready" : "") }, [
+      el("strong", { text: String(count) }),
+      el("span", { text: label })
+    ]);
+  }
+
+  function renderGradesOverview(summary) {
+    summary = summary || overallGradeSummary();
+    var kids = [
+      el("div", { class: "pa-kicker", text: "Grades by day / Notas por día" }),
+      el("h3", { text: "How your completed days scored" })
+    ];
+    if (!summary.rows.length) {
+      kids.push(el("p", {
+        class: "pa-muted pa-small",
+        text: "Finish a session with graded checks to see scores here. / Completa una sesión con comprobaciones calificadas para ver notas."
+      }));
+      return el("div", { class: "pa-card" }, kids);
+    }
+
+    kids.push(el("p", {
+      class: "pa-grade-overall",
+      text: "Overall average / Promedio: " + summary.overall + "%"
+    }));
+    kids.push(el("p", {
+      class: "pa-muted pa-small",
+      text: "Scoring: correct 100% · mostly correct 60% · not correct 0%."
+    }));
+
+    var list = el("div", { class: "pa-grade-list" });
+    summary.rows.slice().reverse().slice(0, 12).forEach(function (row) {
+      var entry = dayEntry(row.day);
+      list.appendChild(el("div", { class: "pa-grade-row" }, [
+        el("div", { class: "pa-grade-day", text: "Day " + row.day }),
+        el("div", { class: "pa-grade-meta" }, [
+          el("div", { text: entry ? entry.day.focus : ("Plan day " + row.day) }),
+          el("div", {
+            class: "pa-muted pa-small",
+            text: (row.date || "—") + " · " +
+              (row.tallies.correct || 0) + " ✓ · " +
+              (row.tallies.mostly_correct || 0) + " ~ · " +
+              (row.tallies.incorrect || 0) + " ✗"
+          })
+        ]),
+        el("div", {
+          class: "pa-grade-pct " + gradePctClass(row.score),
+          text: row.score + "%"
+        })
+      ]));
+    });
+    kids.push(list);
+    if (summary.rows.length > 12) {
+      kids.push(el("p", {
+        class: "pa-muted pa-small",
+        text: "Showing the 12 most recent graded days. / Mostrando los 12 días más recientes."
+      }));
+    }
+    return el("div", { class: "pa-card" }, kids);
+  }
+
+  function gradePctClass(score) {
+    if (score >= 80) return "pa-grade-pct-high";
+    if (score >= 50) return "pa-grade-pct-mid";
+    return "pa-grade-pct-low";
+  }
+
+  function renderPracticeCalendar() {
+    var practiced = practicedDateSet();
+    var year = calCursor.getFullYear();
+    var month = calCursor.getMonth();
+    var monthName = calCursor.toLocaleString(undefined, { month: "long", year: "numeric" });
+    var firstDow = new Date(year, month, 1).getDay(); // 0 Sun
+    var daysInMonth = new Date(year, month + 1, 0).getDate();
+    var today = todayKey();
+
+    var startBound = null;
+    if (state.startedAt) {
+      startBound = parseDateKey(dateKey(new Date(state.startedAt)));
+    }
+    Object.keys(practiced).forEach(function (k) {
+      var d = parseDateKey(k);
+      if (!d) return;
+      if (!startBound || d < startBound) startBound = d;
+    });
+
+    var head = el("div", { class: "pa-cal-head" }, [
+      el("button", {
+        class: "pa-btn pa-btn-ghost pa-btn-small",
+        text: "←",
+        onclick: function () {
+          calCursor.setMonth(calCursor.getMonth() - 1);
+          render();
+        }
+      }),
+      el("div", { class: "pa-cal-title", text: monthName }),
+      el("button", {
+        class: "pa-btn pa-btn-ghost pa-btn-small",
+        text: "→",
+        onclick: function () {
+          calCursor.setMonth(calCursor.getMonth() + 1);
+          render();
+        }
+      })
+    ]);
+
+    var grid = el("div", { class: "pa-cal-grid" });
+    ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"].forEach(function (d) {
+      grid.appendChild(el("div", { class: "pa-cal-dow", text: d }));
+    });
+
+    for (var i = 0; i < firstDow; i++) {
+      grid.appendChild(el("div", { class: "pa-cal-cell pa-cal-empty" }));
+    }
+
+    for (var dayNum = 1; dayNum <= daysInMonth; dayNum++) {
+      var cellDate = new Date(year, month, dayNum);
+      var key = dateKey(cellDate);
+      var isFuture = key > today;
+      var beforeStart = startBound ? key < dateKey(startBound) : false;
+      var did = !!practiced[key];
+      var classes = "pa-cal-cell";
+      var title = key;
+      if (key === today) classes += " pa-cal-today";
+      if (isFuture || beforeStart) {
+        classes += " pa-cal-out";
+      } else if (did) {
+        classes += " pa-cal-done";
+        title += " · practiced";
+      } else {
+        classes += " pa-cal-miss";
+        title += " · no practice";
+      }
+      grid.appendChild(el("div", {
+        class: classes,
+        title: title,
+        text: String(dayNum)
+      }));
+    }
+
+    var legend = el("div", { class: "pa-cal-legend" }, [
+      el("span", { class: "pa-cal-leg pa-cal-done", text: "Practiced / Hecho" }),
+      el("span", { class: "pa-cal-leg pa-cal-miss", text: "Missed / Sin práctica" }),
+      el("span", { class: "pa-cal-leg pa-cal-today", text: "Today / Hoy" })
+    ]);
+
+    return el("div", { class: "pa-card" }, [
+      el("div", { class: "pa-kicker", text: "Practice calendar / Calendario" }),
+      el("h3", { text: "Days you practiced" }),
+      el("p", {
+        class: "pa-muted pa-small",
+        text: "Exact calendar days with a finished session or spaced test since you started. / Días exactos con sesión o prueba desde que empezaste."
+      }),
+      head,
+      grid,
+      legend
+    ]);
   }
 
   function renderTopicFocus() {
@@ -474,8 +886,13 @@
         var focus = (normalizeDay(s.days[i]).focus) || ("Day " + (i + 1));
         var completed = isDayCompleted(globalDay);
         var isNext = globalDay === next && next <= GOAL;
+        var logEntry = state.log[globalDay];
+        var dayScore = logEntry ? scoreFromGrades(logEntry.grades) : null;
         var statusPill = completed
-          ? el("span", { class: "pa-pill pa-pill-done", text: "Done" })
+          ? el("span", {
+            class: "pa-pill pa-pill-done",
+            text: dayScore !== null ? ("Done · " + dayScore + "%") : "Done"
+          })
           : (isNext
             ? el("span", { class: "pa-pill pa-pill-next", text: "Up next" })
             : el("span", { class: "pa-pill pa-pill-locked", text: "Locked" }));
@@ -567,7 +984,7 @@
 
   function startSession(dayNumber, opts) {
     opts = opts || {};
-    // Guard against onclick passing a MouseEvent as the first argument.
+    clearTestTimer();
     if (typeof dayNumber !== "number" || !isFinite(dayNumber)) {
       dayNumber = currentDay();
       opts = {};
@@ -576,15 +993,16 @@
     if (!entry) return;
     var isRetry = !!opts.retry || isDayCompleted(dayNumber);
     if (!isRetry && dayNumber !== currentDay()) {
-      // Don't allow skipping ahead.
       dayNumber = currentDay();
       entry = dayEntry(dayNumber);
       isRetry = false;
       if (!entry) return;
     }
-    var questions = (entry.day.check || []).map(function (q) { return { q: q, from: null }; })
-      .concat(reviewQuestions(dayNumber));
+    var questions = (entry.day.check || []).map(function (q) {
+      return { q: q, from: null, bucket: null, planDay: dayNumber };
+    }).concat(reviewQuestions(dayNumber));
     session = {
+      mode: "day",
       dayNumber: dayNumber,
       entry: entry,
       questions: questions,
@@ -599,18 +1017,124 @@
     root.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
+  function startPracticeTest() {
+    clearTestTimer();
+    var questions = buildPracticeTestQuestions();
+    if (!questions.length) {
+      window.alert("No completed material to test yet. Finish a practice day first.");
+      return;
+    }
+    session = {
+      mode: "test",
+      dayNumber: null,
+      entry: null,
+      questions: questions,
+      qIndex: 0,
+      grades: [],
+      work: "",
+      isRetry: false,
+      phase: "check",
+      startedAtMs: Date.now(),
+      endsAtMs: Date.now() + TEST_SECONDS * 1000,
+      timedOut: false
+    };
+    if (!state.startedAt) { state.startedAt = new Date().toISOString(); save(); }
+    render();
+    startTestTicker();
+    root.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  function startTestTicker() {
+    clearTestTimer();
+    testTimerId = setInterval(function () {
+      if (!session || session.mode !== "test") {
+        clearTestTimer();
+        return;
+      }
+      var left = Math.max(0, session.endsAtMs - Date.now());
+      var node = document.getElementById("pa-test-timer");
+      if (node) node.textContent = formatMs(left);
+      if (left <= 0) {
+        clearTestTimer();
+        session.timedOut = true;
+        completePracticeTest();
+      }
+    }, 250);
+  }
+
+  function formatMs(ms) {
+    var s = Math.ceil(ms / 1000);
+    var m = Math.floor(s / 60);
+    var r = s % 60;
+    return m + ":" + String(r).padStart(2, "0");
+  }
+
+  function canGoBack() {
+    if (!session || session.phase === "done") return false;
+    if (session.mode === "test") return session.qIndex > 0;
+    if (session.phase === "review") return false;
+    if (session.phase === "task") return true;
+    if (session.phase === "check") return true;
+    return false;
+  }
+
+  function goBackStep() {
+    if (!session || !canGoBack()) return;
+    if (session.mode === "test") {
+      if (session.qIndex > 0) {
+        session.qIndex--;
+        render();
+        startTestTicker();
+      }
+      return;
+    }
+    if (session.phase === "task") {
+      session.phase = "review";
+      render();
+      return;
+    }
+    if (session.phase === "check") {
+      if (session.qIndex > 0) {
+        session.qIndex--;
+      } else {
+        session.phase = "task";
+      }
+      render();
+    }
+  }
+
   function renderSession() {
     var s = session;
+    if (s.mode === "test") {
+      renderTestSession();
+      return;
+    }
+
     var steps = { review: 1, task: 2, check: 3, done: 3 };
     var labels = { review: "Concept cue", task: "Do the practice", check: "Check your work", done: "Done" };
-    var head = el("div", { class: "pa-session-head" }, [
+    var headKids = [
       el("div", { class: "pa-kicker", text: (s.isRetry ? "Retry · " : "") + "Day " + s.dayNumber + " of " + GOAL + " - " + s.entry.subject.title }),
-      s.phase !== "done" ? el("div", { class: "pa-step-label", text: "Step " + steps[s.phase] + " of 3 · " + labels[s.phase] }) : null,
-      el("button", { class: "pa-btn pa-btn-ghost pa-exit", text: "Exit session", onclick: function () { session = null; render(); } })
-    ]);
-    root.appendChild(head);
+      s.phase !== "done" ? el("div", { class: "pa-step-label", text: "Step " + steps[s.phase] + " of 3 · " + labels[s.phase] }) : null
+    ];
+    var actions = el("div", { class: "pa-session-actions" });
+    if (canGoBack()) {
+      actions.appendChild(el("button", {
+        class: "pa-btn pa-btn-ghost pa-btn-small",
+        text: "← Back / Atrás",
+        onclick: function () { goBackStep(); }
+      }));
+    }
+    actions.appendChild(el("button", {
+      class: "pa-btn pa-btn-ghost pa-exit",
+      text: "Exit session",
+      onclick: function () { clearTestTimer(); session = null; render(); }
+    }));
+    headKids.push(actions);
+
+    var head = el("div", { class: "pa-session-head" }, headKids);
+    viewRoot.appendChild(head);
     if (s.isRetry && s.phase === "review") {
-      root.appendChild(el("div", { class: "pa-card pa-notice" }, [
+      viewRoot.appendChild(el("div", { class: "pa-card pa-notice" }, [
         el("p", { text: "This is a retry of a day you already completed. Your plan progress stays where it is — you're just practicing again." })
       ]));
     }
@@ -621,19 +1145,65 @@
     else renderDone();
   }
 
+  function renderTestSession() {
+    var s = session;
+    var left = Math.max(0, s.endsAtMs - Date.now());
+    var head = el("div", { class: "pa-session-head" }, [
+      el("div", { class: "pa-kicker", text: "Spaced practice test / Prueba espaciada" }),
+      s.phase !== "done"
+        ? el("div", { class: "pa-step-label", text: "Check " + Math.min(s.qIndex + 1, s.questions.length) + " of " + s.questions.length })
+        : null,
+      el("div", { class: "pa-test-timer", id: "pa-test-timer", text: formatMs(left) }),
+      el("div", { class: "pa-session-actions" }, [
+        canGoBack()
+          ? el("button", {
+            class: "pa-btn pa-btn-ghost pa-btn-small",
+            text: "← Back / Atrás",
+            onclick: function () { goBackStep(); }
+          })
+          : null,
+        el("button", {
+          class: "pa-btn pa-btn-ghost pa-exit",
+          text: "Exit test",
+          onclick: function () {
+            clearTestTimer();
+            session = null;
+            render();
+          }
+        })
+      ])
+    ]);
+    viewRoot.appendChild(head);
+
+    if (s.phase === "done") {
+      renderTestDone();
+      return;
+    }
+
+    viewRoot.appendChild(el("div", { class: "pa-card pa-notice" }, [
+      el("p", {
+        text: "Answer from memory. The tutor on the side will not give away answers. / Responde de memoria. El tutor no revelará respuestas."
+      })
+    ]));
+    renderCheck();
+    startTestTicker();
+  }
+
   function renderReview() {
     var s = session;
-    root.appendChild(el("div", { class: "pa-card" }, [
+    viewRoot.appendChild(el("div", { class: "pa-card" }, [
       el("h3", { text: s.entry.day.focus }),
       el("p", { class: "pa-review" }, [emphasize(s.entry.day.review)]),
       el("p", { class: "pa-small" }, [
         el("a", { href: s.entry.subject.lesson, text: "Read the full lesson: " + s.entry.subject.title })
       ]),
-      el("button", {
-        class: "pa-btn pa-btn-primary",
-        text: "Start today's practice task",
-        onclick: function () { s.phase = "task"; render(); }
-      })
+      el("div", { class: "pa-auth-buttons" }, [
+        el("button", {
+          class: "pa-btn pa-btn-primary",
+          text: "Start today's practice task",
+          onclick: function () { s.phase = "task"; render(); }
+        })
+      ])
     ]));
   }
 
@@ -649,25 +1219,32 @@
     area.value = s.work || "";
     area.addEventListener("input", function () { s.work = area.value; });
 
-    root.appendChild(el("div", { class: "pa-card" }, [
+    viewRoot.appendChild(el("div", { class: "pa-card" }, [
       el("div", { class: "pa-kicker", text: "Do this now · about " + mins + " minutes" }),
       el("h3", { text: "Today's practice task" }),
       el("p", { class: "pa-review" }, [emphasize(task.do || "")]),
       el("p", { class: "pa-muted pa-small", text: "Use your own study material. The check step will ask about what you just did — so do the work first." }),
       el("label", { class: "pa-label", text: task.capture || "Capture your attempt" }),
       area,
-      el("button", {
-        class: "pa-btn pa-btn-primary",
-        text: "I've done the task — check me",
-        onclick: function () {
-          s.work = area.value;
-          if (!s.work.trim()) {
-            if (!window.confirm("You haven't written anything yet. Continue to the check anyway?")) return;
+      el("div", { class: "pa-auth-buttons" }, [
+        el("button", {
+          class: "pa-btn pa-btn-ghost",
+          text: "← Back / Atrás",
+          onclick: function () { goBackStep(); }
+        }),
+        el("button", {
+          class: "pa-btn pa-btn-primary",
+          text: "I've done the task — check me",
+          onclick: function () {
+            s.work = area.value;
+            if (!s.work.trim()) {
+              if (!window.confirm("You haven't written anything yet. Continue to the check anyway?")) return;
+            }
+            s.phase = "check";
+            render();
           }
-          s.phase = "check";
-          render();
-        }
-      })
+        })
+      ])
     ]));
   }
 
@@ -690,6 +1267,7 @@
     if (!user) {
       return Promise.reject(new Error("Sign in to get AI feedback on your written answers."));
     }
+    payload = Object.assign({ mode: "grade" }, payload || {});
     return aw.functions
       .createExecution({
         functionId: cfg.functionId,
@@ -715,6 +1293,48 @@
       });
   }
 
+  function callTutorFunction(payload) {
+    if (!aw || !cfg || !cfg.functionId) {
+      return Promise.reject(new Error("AI tutor is not configured yet."));
+    }
+    if (!user) {
+      return Promise.reject(new Error("Sign in to use the Spanish tutor."));
+    }
+    payload = Object.assign({ mode: "tutor" }, payload || {});
+    return aw.functions
+      .createExecution({
+        functionId: cfg.functionId,
+        body: JSON.stringify(payload),
+        xasync: false,
+        path: "/",
+        method: "POST",
+        headers: { "content-type": "application/json" }
+      })
+      .then(function (exec) {
+        var status = exec.responseStatusCode || exec.statusCode;
+        var raw = exec.responseBody || "";
+        var data;
+        try { data = JSON.parse(raw); } catch (e) {
+          throw new Error("Tutor returned an unreadable response.");
+        }
+        if (status && status >= 400) {
+          throw new Error(data.error || "Tutor failed (" + status + ").");
+        }
+        if (data.error) throw new Error(data.error);
+        if (!data.reply) throw new Error("Tutor did not return a reply.");
+        return data;
+      });
+  }
+
+  function bucketLabel(item) {
+    if (!item) return "";
+    if (item.bucket === "day") return " · 1 day prior";
+    if (item.bucket === "week") return " · 1 week prior";
+    if (item.bucket === "month") return " · 1 month prior";
+    if (item.from) return " · spaced review from " + item.from;
+    return "";
+  }
+
   function renderCheck() {
     var s = session;
     var item = s.questions[s.qIndex];
@@ -723,7 +1343,7 @@
     if (s[draftKey] === undefined) s[draftKey] = "";
 
     var kids = [];
-    if (s.work && s.work.trim()) {
+    if (s.mode !== "test" && s.work && s.work.trim()) {
       kids.push(el("details", { class: "pa-work-recall" }, [
         el("summary", { text: "Your attempt from the practice task" }),
         el("pre", { class: "pa-work-text", text: s.work })
@@ -731,14 +1351,22 @@
     }
 
     kids.push(
-      el("div", { class: "pa-quiz-meta", text: "Check " + (s.qIndex + 1) + " of " + s.questions.length + (item.from ? " · spaced review from " + item.from : "") }),
+      el("div", {
+        class: "pa-quiz-meta",
+        text: "Check " + (s.qIndex + 1) + " of " + s.questions.length + bucketLabel(item)
+      }),
       el("h3", { class: "pa-question", text: q.q }),
-      el("p", { class: "pa-muted pa-small", text: "Write your answer in your own words. An open-source model (Llama via Groq) will grade it as correct, mostly correct, or not correct." })
+      el("p", {
+        class: "pa-muted pa-small",
+        text: s.mode === "test"
+          ? "Timed test — write briefly. Llama grades when you submit. / Prueba cronometrada — responde breve."
+          : "Write your answer in your own words. An open-source model (Llama via Groq) will grade it as correct, mostly correct, or not correct."
+      })
     );
 
     var area = el("textarea", {
       class: "pa-textarea",
-      rows: "5",
+      rows: s.mode === "test" ? "4" : "5",
       placeholder: "Type your answer here…"
     });
     area.value = s[draftKey];
@@ -754,72 +1382,102 @@
       actions.querySelectorAll("button").forEach(function (btn) { btn.disabled = b; });
     }
 
+    function advanceAfterGrade(result) {
+      s.grades[s.qIndex] = result.grade;
+      s.qIndex++;
+      if (s.qIndex >= s.questions.length) {
+        if (s.mode === "test") completePracticeTest();
+        else completeSession();
+      } else {
+        render();
+        if (s.mode === "test") startTestTicker();
+      }
+    }
+
     function showResult(result) {
       feedbackBox.innerHTML = "";
       feedbackBox.appendChild(el("div", {
         class: "pa-grade-badge " + gradeClass(result.grade),
         text: gradeLabel(result.grade)
       }));
-      feedbackBox.appendChild(el("p", { class: "pa-explain " + (result.grade === "incorrect" ? "pa-explain-wrong" : "pa-explain-right"), text: result.feedback || "" }));
+      feedbackBox.appendChild(el("p", {
+        class: "pa-explain " + (result.grade === "incorrect" ? "pa-explain-wrong" : "pa-explain-right"),
+        text: result.feedback || ""
+      }));
 
       actions.innerHTML = "";
+      if (s.mode !== "test") {
+        actions.appendChild(el("button", {
+          class: "pa-btn pa-btn-ghost",
+          text: "Retry this check",
+          onclick: function () {
+            s.grades[s.qIndex] = undefined;
+            render();
+          }
+        }));
+      }
+      actions.appendChild(el("button", {
+        class: "pa-btn pa-btn-primary",
+        text: s.qIndex + 1 < s.questions.length
+          ? (s.mode === "test" ? "Next / Siguiente" : "Continue to next check")
+          : (s.mode === "test" ? "Finish test" : "Finish session"),
+        onclick: function () { advanceAfterGrade(result); }
+      }));
+    }
+
+    // Restore prior grade UI if user navigated back to a graded check.
+    if (s.grades[s.qIndex]) {
+      showResult({ grade: s.grades[s.qIndex], feedback: s["feedback" + s.qIndex] || "Previously graded." });
+    } else {
       actions.appendChild(el("button", {
         class: "pa-btn pa-btn-ghost",
-        text: "Retry this check",
-        onclick: function () {
-          s.grades[s.qIndex] = undefined;
-          render();
-        }
+        text: "← Back / Atrás",
+        onclick: function () { goBackStep(); }
       }));
       actions.appendChild(el("button", {
         class: "pa-btn pa-btn-primary",
-        text: s.qIndex + 1 < s.questions.length ? "Continue to next check" : "Finish session",
+        text: "Submit for AI grading",
         onclick: function () {
-          s.grades[s.qIndex] = result.grade;
-          s.qIndex++;
-          if (s.qIndex >= s.questions.length) completeSession();
-          else render();
+          var answer = (area.value || "").trim();
+          s[draftKey] = area.value;
+          if (!answer) {
+            statusLine.textContent = "Write an answer before submitting.";
+            statusLine.className = "pa-error";
+            return;
+          }
+          if (s.mode === "test" && Date.now() >= s.endsAtMs) {
+            s.timedOut = true;
+            completePracticeTest();
+            return;
+          }
+          statusLine.className = "pa-muted pa-small";
+          statusLine.textContent = "Grading with Llama (Groq)…";
+          setBusy(true);
+          callGradeFunction({
+            question: q.q,
+            rubric: q.rubric,
+            exemplar: q.exemplar || "",
+            userAnswer: answer,
+            focus: (s.entry && s.entry.day && s.entry.day.focus) || "Spaced practice test",
+            taskWork: s.work || ""
+          })
+            .then(function (result) {
+              statusLine.textContent = "";
+              setBusy(false);
+              s["feedback" + s.qIndex] = result.feedback || "";
+              showResult(result);
+            })
+            .catch(function (err) {
+              setBusy(false);
+              statusLine.className = "pa-error";
+              statusLine.textContent = (err && err.message) || "Grading failed.";
+            });
         }
       }));
     }
 
-    actions.appendChild(el("button", {
-      class: "pa-btn pa-btn-primary",
-      text: "Submit for AI grading",
-      onclick: function () {
-        var answer = (area.value || "").trim();
-        s[draftKey] = area.value;
-        if (!answer) {
-          statusLine.textContent = "Write an answer before submitting.";
-          statusLine.className = "pa-error";
-          return;
-        }
-        statusLine.className = "pa-muted pa-small";
-        statusLine.textContent = "Grading with Llama (Groq)…";
-        setBusy(true);
-        callGradeFunction({
-          question: q.q,
-          rubric: q.rubric,
-          exemplar: q.exemplar || "",
-          userAnswer: answer,
-          focus: s.entry.day.focus || "",
-          taskWork: s.work || ""
-        })
-          .then(function (result) {
-            statusLine.textContent = "";
-            setBusy(false);
-            showResult(result);
-          })
-          .catch(function (err) {
-            setBusy(false);
-            statusLine.className = "pa-error";
-            statusLine.textContent = (err && err.message) || "Grading failed.";
-          });
-      }
-    }));
-
     kids.push(statusLine, feedbackBox, actions);
-    root.appendChild(el("div", { class: "pa-card" }, kids));
+    viewRoot.appendChild(el("div", { class: "pa-card" }, kids));
   }
 
   function completeSession() {
@@ -846,12 +1504,45 @@
     render();
   }
 
+  function completePracticeTest() {
+    clearTestTimer();
+    var s = session;
+    if (!s || s.mode !== "test") return;
+    var tallies = { correct: 0, mostly_correct: 0, incorrect: 0 };
+    var answered = 0;
+    (s.grades || []).forEach(function (g) {
+      if (tallies[g] !== undefined) {
+        tallies[g]++;
+        answered++;
+      }
+    });
+    var score = scoreFromGrades(s.grades);
+    var record = {
+      id: "t-" + Date.now() + "-" + Math.floor(Math.random() * 1000),
+      at: Date.now(),
+      date: todayKey(),
+      score: score,
+      tallies: tallies,
+      answered: answered,
+      total: s.questions.length,
+      timedOut: !!s.timedOut,
+      buckets: s.questions.map(function (q) { return q.bucket || "review"; })
+    };
+    state.testLog = [record].concat(state.testLog || []).slice(0, 60);
+    save();
+    s.phase = "done";
+    s.lastTest = record;
+    render();
+  }
+
   function renderDone() {
     var s = session;
     var next = currentDay();
     var tallies = { correct: 0, mostly_correct: 0, incorrect: 0 };
     (s.grades || []).forEach(function (g) { if (tallies[g] !== undefined) tallies[g]++; });
-    var summary = tallies.correct + " correct · " + tallies.mostly_correct + " mostly · " + tallies.incorrect + " not correct";
+    var score = scoreFromGrades(s.grades);
+    var summary = tallies.correct + " correct · " + tallies.mostly_correct + " mostly · " + tallies.incorrect + " not correct" +
+      (score !== null ? " · " + score + "%" : "");
     var msg;
     if (s.isRetry) {
       msg = "Retry complete. Your plan is still on Day " + Math.min(next, GOAL) + " — this practice didn't change your progress.";
@@ -862,7 +1553,7 @@
     } else {
       msg = "Session complete — use the feedback on the weaker answers tomorrow. Day " + next + " is next.";
     }
-    root.appendChild(el("div", { class: "pa-card pa-done" }, [
+    viewRoot.appendChild(el("div", { class: "pa-card pa-done" }, [
       el("div", { class: "pa-done-mark", text: "\u2713" }),
       el("h3", { text: s.isRetry ? "Day " + s.dayNumber + " retry complete" : "Day " + s.dayNumber + " complete" }),
       el("p", { text: summary + ". " + msg }),
@@ -876,6 +1567,149 @@
         })
       ])
     ]));
+  }
+
+  function renderTestDone() {
+    var s = session;
+    var record = s.lastTest || {};
+    var tallies = record.tallies || { correct: 0, mostly_correct: 0, incorrect: 0 };
+    viewRoot.appendChild(el("div", { class: "pa-card pa-done" }, [
+      el("div", { class: "pa-done-mark", text: record.timedOut ? "⏱" : "\u2713" }),
+      el("h3", { text: record.timedOut ? "Time's up — test saved" : "Practice test complete" }),
+      el("p", {
+        text: (record.score != null ? record.score + "% · " : "") +
+          (tallies.correct || 0) + " correct · " +
+          (tallies.mostly_correct || 0) + " mostly · " +
+          (tallies.incorrect || 0) + " not correct · " +
+          (record.answered || 0) + "/" + (record.total || 0) + " answered"
+      }),
+      el("p", {
+        class: "pa-muted pa-small",
+        text: "This test does not change your day-plan position. Come back tomorrow for another spaced check."
+      }),
+      el("div", { class: "pa-auth-buttons" }, [
+        el("button", {
+          class: "pa-btn pa-btn-primary",
+          text: "Back to overview",
+          onclick: function () { session = null; render(); }
+        }),
+        el("button", {
+          class: "pa-btn pa-btn-ghost",
+          text: "Take another test",
+          onclick: function () { startPracticeTest(); }
+        })
+      ])
+    ]));
+  }
+
+  /* ---------------- Spanish tutor sidebar ---------------- */
+
+  function activeQuestionText() {
+    if (!session || session.phase !== "check") return "";
+    var item = session.questions[session.qIndex];
+    return (item && item.q && item.q.q) || "";
+  }
+
+  function renderTutor(host) {
+    var panel = el("div", { class: "pa-tutor" });
+    panel.appendChild(el("div", { class: "pa-tutor-head" }, [
+      el("div", { class: "pa-kicker", text: "Spanish tutor / Tutor" }),
+      el("h3", { text: "Ask Llama" }),
+      el("p", {
+        class: "pa-muted pa-small",
+        text: "Translations, why a phrase works, alternatives — but it will not give away practice answers."
+      })
+    ]));
+
+    var thread = el("div", { class: "pa-tutor-thread", id: "pa-tutor-thread" });
+    if (!tutorMessages.length) {
+      thread.appendChild(el("div", {
+        class: "pa-tutor-bubble pa-tutor-assistant",
+        text: "Hola — ask me to translate a phrase, explain a conjugation, or compare options. I will not solve your practice checks for you."
+      }));
+    } else {
+      tutorMessages.forEach(function (m) {
+        thread.appendChild(el("div", {
+          class: "pa-tutor-bubble " + (m.role === "user" ? "pa-tutor-user" : "pa-tutor-assistant"),
+          text: m.content
+        }));
+      });
+    }
+    panel.appendChild(thread);
+
+    var status = el("p", { class: "pa-muted pa-small", id: "pa-tutor-status" });
+    var area = el("textarea", {
+      class: "pa-textarea pa-tutor-input",
+      rows: "3",
+      placeholder: "e.g. Why say «tengo hambre» and not «soy hambre»?"
+    });
+    area.value = tutorDraft;
+    area.addEventListener("input", function () { tutorDraft = area.value; });
+
+    var send = el("button", {
+      class: "pa-btn pa-btn-primary pa-btn-small",
+      text: tutorBusy ? "Thinking…" : "Ask tutor",
+      onclick: function () { sendTutorMessage(area, status); }
+    });
+    if (tutorBusy) send.disabled = true;
+
+    var clear = el("button", {
+      class: "pa-btn pa-btn-ghost pa-btn-small",
+      text: "Clear chat",
+      onclick: function () {
+        tutorMessages = [];
+        tutorDraft = "";
+        render();
+      }
+    });
+
+    panel.appendChild(status);
+    panel.appendChild(area);
+    panel.appendChild(el("div", { class: "pa-auth-buttons" }, [send, clear]));
+
+    if (!user) {
+      panel.appendChild(el("p", {
+        class: "pa-muted pa-small",
+        text: "Sign in below to chat with the tutor (same Llama/Groq path as grading)."
+      }));
+    }
+
+    host.appendChild(panel);
+    thread.scrollTop = thread.scrollHeight;
+  }
+
+  function sendTutorMessage(area, status) {
+    var text = (area.value || "").trim();
+    if (!text || tutorBusy) return;
+    tutorDraft = "";
+    tutorMessages.push({ role: "user", content: text });
+    tutorBusy = true;
+    render();
+
+    var history = tutorMessages.slice(0, -1).map(function (m) {
+      return { role: m.role, content: m.content };
+    });
+
+    callTutorFunction({
+      message: text,
+      history: history,
+      activeQuestion: activeQuestionText(),
+      phase: session ? session.phase : "dashboard",
+      sessionMode: session ? session.mode : "none"
+    })
+      .then(function (data) {
+        tutorMessages.push({ role: "assistant", content: data.reply });
+        tutorBusy = false;
+        render();
+      })
+      .catch(function (err) {
+        tutorBusy = false;
+        tutorMessages.push({
+          role: "assistant",
+          content: "Sorry — " + ((err && err.message) || "tutor unavailable.")
+        });
+        render();
+      });
   }
 
   /* ---------------- account panel ---------------- */
@@ -896,7 +1730,6 @@
 
   function authFailMessage(err) {
     var msg = (err && err.message) || "Something went wrong. Please try again.";
-    // Unknown Appwrite web platform → browser hides the 403 as a NetworkError.
     if (/networkerror|failed to fetch|load failed|network request failed/i.test(msg)) {
       msg =
         "Could not reach Appwrite from " + location.origin +
@@ -924,7 +1757,7 @@
       panel.appendChild(el("p", {}, [
         document.createTextNode("Signed in as "),
         el("strong", { text: user.email || user.name || user.$id }),
-        document.createTextNode(". Progress syncs to the cloud, and written checks are graded by an open-source model (Llama via Groq).")
+        document.createTextNode(". Progress syncs to the cloud. Written checks and the Spanish tutor use Llama via Groq.")
       ]));
       panel.appendChild(el("p", { class: "pa-muted pa-small", id: "pa-sync-line", text: syncMsg }));
       panel.appendChild(el("button", {
@@ -956,7 +1789,7 @@
         authView = "login";
         return pullCloud();
       }).then(function () {
-        save(); // push merged state back up
+        save();
         render();
       });
     }
@@ -1093,7 +1926,7 @@
       return panel;
     }
 
-    panel.appendChild(el("p", { class: "pa-muted", text: "Sign in to sync progress and unlock AI grading on written checks. Until then, progress stays in this browser and checks cannot be graded." }));
+    panel.appendChild(el("p", { class: "pa-muted", text: "Sign in to sync progress, unlock AI grading, and use the Spanish tutor. Until then, progress stays in this browser." }));
 
     var email = el("input", { class: "pa-input", type: "email", placeholder: "Email", autocomplete: "email" });
     var password = el("input", { class: "pa-input", type: "password", placeholder: "Password (8+ characters)", autocomplete: "current-password" });

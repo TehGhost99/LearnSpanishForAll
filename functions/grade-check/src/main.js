@@ -1,38 +1,55 @@
 /**
  * Appwrite Function: grade-check
- * Grades a learner's free-text practice check with an open-source model via Groq
- * (Llama — free tier, no credit card required for light personal use).
+ * Two modes via body.mode:
+ *   - "grade" (default): grade free-text practice checks
+ *   - "tutor": Spanish study helper chat (translations, grammar, alternatives)
+ *              that must NOT reveal answers to active practice / test questions
  *
  * Env: GROQ_API_KEY
- * Body JSON: { question, rubric, exemplar, userAnswer, focus?, taskWork? }
- * Response JSON: { grade: "correct"|"mostly_correct"|"incorrect", feedback: string }
+ * Model: Llama 3.1 8B Instant via Groq
  */
 const MODEL = "llama-3.1-8b-instant";
 
-export default async ({ req, res, log, error }) => {
-  if (req.method === "OPTIONS") {
-    return res.send("", 204, {
-      "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Appwrite-Project, X-Appwrite-Key",
-      "Access-Control-Allow-Methods": "POST, OPTIONS",
-    });
-  }
+function corsHeaders() {
+  return {
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Headers":
+      "Content-Type, Authorization, X-Appwrite-Project, X-Appwrite-Key",
+    "Access-Control-Allow-Methods": "POST, OPTIONS",
+  };
+}
 
-  const apiKey = process.env.GROQ_API_KEY;
-  if (!apiKey) {
-    error("GROQ_API_KEY is not set");
-    return res.json({ error: "Grading is not configured (missing API key)." }, 500);
-  }
+async function callGroq(apiKey, messages, { temperature = 0.2, max_tokens = 400, json = true } = {}) {
+  const body = {
+    model: MODEL,
+    temperature,
+    max_tokens,
+    messages,
+  };
+  if (json) body.response_format = { type: "json_object" };
 
-  let body;
-  try {
-    body = typeof req.bodyJson === "object" && req.bodyJson
-      ? req.bodyJson
-      : JSON.parse(req.body || "{}");
-  } catch (e) {
-    return res.json({ error: "Invalid JSON body." }, 400);
-  }
+  const groqRes = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+    method: "POST",
+    headers: {
+      "content-type": "application/json",
+      authorization: "Bearer " + apiKey,
+    },
+    body: JSON.stringify(body),
+  });
+  const groqData = await groqRes.json();
+  return { groqRes, groqData };
+}
 
+function parseJsonLoose(text) {
+  const cleaned = String(text || "")
+    .replace(/^```json\s*/i, "")
+    .replace(/^```\s*/i, "")
+    .replace(/\s*```$/, "")
+    .trim();
+  return JSON.parse(cleaned);
+}
+
+async function handleGrade(body, apiKey, { log, error, res }) {
   const question = (body.question || "").trim();
   const rubric = (body.rubric || "").trim();
   const exemplar = (body.exemplar || "").trim();
@@ -68,28 +85,14 @@ Respond with ONLY valid JSON (no markdown fences):
 {"grade":"correct"|"mostly_correct"|"incorrect","feedback":"2-4 sentences. Be encouraging and specific. Say what worked and what to improve. Do not reveal a full model answer word-for-word."}`;
 
   try {
-    const groqRes = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "content-type": "application/json",
-        authorization: "Bearer " + apiKey,
+    const { groqRes, groqData } = await callGroq(apiKey, [
+      {
+        role: "system",
+        content: "You grade short Spanish-learning answers. Reply with JSON only.",
       },
-      body: JSON.stringify({
-        model: MODEL,
-        temperature: 0.2,
-        max_tokens: 400,
-        response_format: { type: "json_object" },
-        messages: [
-          {
-            role: "system",
-            content: "You grade short study-skill answers. Reply with JSON only.",
-          },
-          { role: "user", content: prompt },
-        ],
-      }),
-    });
+      { role: "user", content: prompt },
+    ]);
 
-    const groqData = await groqRes.json();
     if (!groqRes.ok) {
       error("Groq error: " + JSON.stringify(groqData));
       const msg = (groqData.error && groqData.error.message) || "Grading service failed.";
@@ -102,11 +105,7 @@ Respond with ONLY valid JSON (no markdown fences):
 
     let parsed;
     try {
-      const cleaned = text
-        .replace(/^```json\s*/i, "")
-        .replace(/^```\s*/i, "")
-        .replace(/\s*```$/, "");
-      parsed = JSON.parse(cleaned);
+      parsed = parseJsonLoose(text);
     } catch (e) {
       log("Raw model text: " + text);
       return res.json({
@@ -124,4 +123,108 @@ Respond with ONLY valid JSON (no markdown fences):
     error(String(e && e.message ? e.message : e));
     return res.json({ error: "Unexpected grading error." }, 500);
   }
+}
+
+async function handleTutor(body, apiKey, { log, error, res }) {
+  const message = (body.message || "").trim();
+  if (!message) {
+    return res.json({ error: "message is required." }, 400);
+  }
+
+  const history = Array.isArray(body.history) ? body.history.slice(-8) : [];
+  const activeQuestion = (body.activeQuestion || "").trim().slice(0, 500);
+  const phase = (body.phase || "").trim().slice(0, 40);
+  const mode = (body.sessionMode || "").trim().slice(0, 40);
+
+  const system = `You are a friendly Latin American Spanish tutor for absolute beginners on LearnSpanishForAll.
+
+You MAY help with:
+- Translations (EN↔ES) of words/phrases the learner provides
+- Why a translation is phrased a certain way
+- Natural alternatives and when to use them
+- Grammar, pronunciation tips (tú/usted; no vosotros as the default)
+- Clarifying lesson vocabulary and usage
+
+You MUST NOT:
+- Give away answers to practice checks, quizzes, or timed practice tests
+- Complete the learner's homework/check for them when they paste a practice question
+- Quote exemplars, rubrics, or "the correct answer is…" for an active practice item
+- Role-play as a grader that fills in the blank for them
+
+If the learner asks for the answer to a practice/test question (including the active one below), refuse politely and coach: suggest strategies, related vocabulary, grammar patterns, or ask them to try first. You may translate unrelated phrases they invent themselves.
+
+Active practice context (do not answer this for them):
+phase=${phase || "none"} sessionMode=${mode || "none"}
+activeQuestion=${activeQuestion || "(none)"}
+
+Reply with ONLY valid JSON:
+{"reply":"your helpful message in clear bilingual EN/ES when useful, max ~180 words"}`;
+
+  const messages = [{ role: "system", content: system }];
+  history.forEach((h) => {
+    if (!h || !h.role || !h.content) return;
+    const role = h.role === "assistant" ? "assistant" : "user";
+    messages.push({ role, content: String(h.content).slice(0, 1200) });
+  });
+  messages.push({ role: "user", content: message.slice(0, 2000) });
+
+  try {
+    const { groqRes, groqData } = await callGroq(
+      apiKey,
+      messages,
+      { temperature: 0.4, max_tokens: 500, json: true }
+    );
+
+    if (!groqRes.ok) {
+      error("Groq tutor error: " + JSON.stringify(groqData));
+      const msg = (groqData.error && groqData.error.message) || "Tutor service failed.";
+      return res.json({ error: msg }, 502);
+    }
+
+    const text = (
+      (((groqData.choices || [])[0] || {}).message || {}).content || ""
+    ).trim();
+
+    let parsed;
+    try {
+      parsed = parseJsonLoose(text);
+    } catch (e) {
+      log("Raw tutor text: " + text);
+      return res.json({ reply: text.slice(0, 1200) || "Sorry — I could not format a reply. Try again." });
+    }
+
+    const reply = String(parsed.reply || parsed.message || text || "No reply.").slice(0, 2000);
+    return res.json({ reply });
+  } catch (e) {
+    error(String(e && e.message ? e.message : e));
+    return res.json({ error: "Unexpected tutor error." }, 500);
+  }
+}
+
+export default async ({ req, res, log, error }) => {
+  if (req.method === "OPTIONS") {
+    return res.send("", 204, corsHeaders());
+  }
+
+  const apiKey = process.env.GROQ_API_KEY;
+  if (!apiKey) {
+    error("GROQ_API_KEY is not set");
+    return res.json({ error: "AI is not configured (missing API key)." }, 500);
+  }
+
+  let body;
+  try {
+    body =
+      typeof req.bodyJson === "object" && req.bodyJson
+        ? req.bodyJson
+        : JSON.parse(req.body || "{}");
+  } catch (e) {
+    return res.json({ error: "Invalid JSON body." }, 400);
+  }
+
+  const mode = String(body.mode || "grade").toLowerCase();
+  if (mode === "tutor") {
+    return handleTutor(body, apiKey, { log, error, res });
+  }
+  return handleGrade(body, apiKey, { log, error, res });
 };

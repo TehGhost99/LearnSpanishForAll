@@ -6,6 +6,6 @@ window.APPWRITE_CONFIG = {
   projectName: "Learnig Spanish",
   databaseId: "6a78f1210011f4b9c94e", // TablesDB "Practice"
   tableId: "progress",
-  // Deployed Appwrite Function that grades written checks via Groq (Llama).
+  // Deployed Appwrite Function that grades written checks via Groq (GPT-OSS 20B).
   functionId: "grade-check"
 };

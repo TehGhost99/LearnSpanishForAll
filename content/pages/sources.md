@@ -27,7 +27,7 @@ summary: Research and standards that shaped the LearnSpanishForAll curriculum.
 ## App backend
 
 - Appwrite Cloud project **Learnig Spanish** (`6a78a8d900090c79eec5`) for auth/progress
-- Groq + Llama (when configured) for written-check grading
+- Groq + GPT-OSS 20B (when configured) for written-check grading and the Spanish tutor
 
 ## Sibling project
 

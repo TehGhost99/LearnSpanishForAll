@@ -2,10 +2,13 @@
 
 Usage (PowerShell):
   $env:APPWRITE_API_KEY = "standard_..."
-  $env:GROQ_API_KEY = "gsk_..."
+  $env:GROQ_API_KEY = "gsk_..."  # optional if already set on the function
+  $env:GROQ_MODEL = "openai/gpt-oss-20b"  # optional
   py scripts/deploy_grade_function.py
 
-Deletes nothing. Safe to re-run (updates deployment + variable).
+Deletes nothing. Safe to re-run (updates deployment + variables).
+Llama 3.1 8B Instant was decommissioned by Groq on 2026-08-16; the default
+model is openai/gpt-oss-20b.
 """
 from __future__ import annotations
 
@@ -24,6 +27,8 @@ ENDPOINT = "https://sfo.cloud.appwrite.io/v1"
 PROJECT = "6a78a8d900090c79eec5"
 FUNCTION_ID = "grade-check"
 VAR_NAME = "GROQ_API_KEY"
+MODEL_VAR = "GROQ_MODEL"
+DEFAULT_MODEL = "openai/gpt-oss-20b"
 
 
 def headers(key: str, extra: dict | None = None) -> dict:
@@ -102,17 +107,23 @@ def build_archive() -> bytes:
     buf = io.BytesIO()
     with tarfile.open(fileobj=buf, mode="w:gz") as tar:
         for path in FN_DIR.rglob("*"):
-            if path.is_file():
-                tar.add(path, arcname=path.relative_to(FN_DIR).as_posix())
+            if not path.is_file():
+                continue
+            if path.name.startswith("test-") or path.name.endswith(".test.js") or path.name.endswith(".test.mjs"):
+                continue
+            tar.add(path, arcname=path.relative_to(FN_DIR).as_posix())
     return buf.getvalue()
 
 
 def main() -> int:
     aw_key = os.environ.get("APPWRITE_API_KEY", "").strip()
     groq_key = os.environ.get("GROQ_API_KEY", "").strip()
-    if not aw_key or not groq_key:
-        print("Set APPWRITE_API_KEY and GROQ_API_KEY environment variables first.")
+    groq_model = os.environ.get("GROQ_MODEL", DEFAULT_MODEL).strip() or DEFAULT_MODEL
+    if not aw_key:
+        print("Set APPWRITE_API_KEY environment variable first.")
         return 1
+    if not groq_key:
+        print("GROQ_API_KEY not set — will keep the existing function variable if present.")
 
     status, data = call("GET", f"/functions/{FUNCTION_ID}", aw_key)
     if status == 404:
@@ -150,37 +161,70 @@ def main() -> int:
 
     status, vars_data = call("GET", f"/functions/{FUNCTION_ID}/variables", aw_key)
     existing = None
+    existing_model = None
     if status < 300:
         for v in (vars_data.get("variables") or []):
             if v.get("key") == VAR_NAME:
                 existing = v
-                break
-            if v.get("key") == "ANTHROPIC_API_KEY":
+            elif v.get("key") == MODEL_VAR:
+                existing_model = v
+            elif v.get("key") == "ANTHROPIC_API_KEY":
                 call("DELETE", f"/functions/{FUNCTION_ID}/variables/{v['$id']}", aw_key)
 
-    if existing:
-        print(f"Updating {VAR_NAME}…")
+    if groq_key:
+        if existing:
+            print(f"Updating {VAR_NAME}…")
+            status, data = call(
+                "PUT",
+                f"/functions/{FUNCTION_ID}/variables/{existing['$id']}",
+                aw_key,
+                {"key": VAR_NAME, "value": groq_key, "secret": True},
+            )
+        else:
+            print(f"Creating {VAR_NAME}…")
+            status, data = call(
+                "POST",
+                f"/functions/{FUNCTION_ID}/variables",
+                aw_key,
+                {
+                    "variableId": "unique()",
+                    "key": VAR_NAME,
+                    "value": groq_key,
+                    "secret": True,
+                },
+            )
+        if status >= 300:
+            print("Variable upsert failed:", status, data)
+            return 1
+    elif not existing:
+        print("Set GROQ_API_KEY environment variable first (no existing function variable).")
+        return 1
+    else:
+        print(f"Keeping existing {VAR_NAME}.")
+
+    if existing_model:
+        print(f"Updating {MODEL_VAR} to {groq_model}…")
         status, data = call(
             "PUT",
-            f"/functions/{FUNCTION_ID}/variables/{existing['$id']}",
+            f"/functions/{FUNCTION_ID}/variables/{existing_model['$id']}",
             aw_key,
-            {"key": VAR_NAME, "value": groq_key, "secret": True},
+            {"key": MODEL_VAR, "value": groq_model, "secret": False},
         )
     else:
-        print(f"Creating {VAR_NAME}…")
+        print(f"Creating {MODEL_VAR}={groq_model}…")
         status, data = call(
             "POST",
             f"/functions/{FUNCTION_ID}/variables",
             aw_key,
             {
                 "variableId": "unique()",
-                "key": VAR_NAME,
-                "value": groq_key,
-                "secret": True,
+                "key": MODEL_VAR,
+                "value": groq_model,
+                "secret": False,
             },
         )
     if status >= 300:
-        print("Variable upsert failed:", status, data)
+        print("Model variable upsert failed:", status, data)
         return 1
 
     print("Uploading deployment…")
@@ -200,7 +244,7 @@ def main() -> int:
         status_name = dep.get("status")
         print("  status:", status_name)
         if status_name == "ready":
-            print("Function ready (Groq + Llama).")
+            print(f"Function ready (Groq + {groq_model}).")
             return 0
         if status_name in ("failed", "cancelled"):
             print("Build failed:", dep)

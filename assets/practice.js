@@ -1260,6 +1260,17 @@
     return "pa-grade-incorrect";
   }
 
+  function friendlyAiError(msg) {
+    var text = String(msg || "");
+    if (/invalid api key|invalid_api_key|unauthorized/i.test(text)) {
+      return "AI is temporarily unavailable (invalid Groq API key).";
+    }
+    if (/decommission|does not exist|model_not_found|model.*not.*found/i.test(text)) {
+      return "AI is temporarily unavailable (the model was retired).";
+    }
+    return text;
+  }
+
   function callGradeFunction(payload) {
     if (!aw || !cfg || !cfg.functionId) {
       return Promise.reject(new Error("AI grading is not configured yet."));
@@ -1285,9 +1296,9 @@
           throw new Error("Grader returned an unreadable response.");
         }
         if (status && status >= 400) {
-          throw new Error(data.error || "Grading failed (" + status + ").");
+          throw new Error(friendlyAiError(data.error) || "Grading failed (" + status + ").");
         }
-        if (data.error) throw new Error(data.error);
+        if (data.error) throw new Error(friendlyAiError(data.error));
         if (!data.grade) throw new Error("Grader did not return a grade.");
         return data;
       });
@@ -1318,9 +1329,9 @@
           throw new Error("Tutor returned an unreadable response.");
         }
         if (status && status >= 400) {
-          throw new Error(data.error || "Tutor failed (" + status + ").");
+          throw new Error(friendlyAiError(data.error) || "Tutor failed (" + status + ").");
         }
-        if (data.error) throw new Error(data.error);
+        if (data.error) throw new Error(friendlyAiError(data.error));
         if (!data.reply) throw new Error("Tutor did not return a reply.");
         return data;
       });
@@ -1359,8 +1370,8 @@
       el("p", {
         class: "pa-muted pa-small",
         text: s.mode === "test"
-          ? "Timed test — write briefly. Llama grades when you submit. / Prueba cronometrada — responde breve."
-          : "Write your answer in your own words. An open-source model (Llama via Groq) will grade it as correct, mostly correct, or not correct."
+          ? "Timed test — write briefly. GPT-OSS grades when you submit. / Prueba cronometrada — responde breve."
+          : "Write your answer in your own words. An open-source model (GPT-OSS via Groq) will grade it as correct, mostly correct, or not correct."
       })
     );
 
@@ -1451,7 +1462,7 @@
             return;
           }
           statusLine.className = "pa-muted pa-small";
-          statusLine.textContent = "Grading with Llama (Groq)…";
+          statusLine.textContent = "Grading with GPT-OSS (Groq)…";
           setBusy(true);
           callGradeFunction({
             question: q.q,
@@ -1614,7 +1625,7 @@
     var panel = el("div", { class: "pa-tutor" });
     panel.appendChild(el("div", { class: "pa-tutor-head" }, [
       el("div", { class: "pa-kicker", text: "Spanish tutor / Tutor" }),
-      el("h3", { text: "Ask Llama" }),
+      el("h3", { text: "Ask GPT-OSS" }),
       el("p", {
         class: "pa-muted pa-small",
         text: "Translations, why a phrase works, alternatives — but it will not give away practice answers."
@@ -1670,7 +1681,7 @@
     if (!user) {
       panel.appendChild(el("p", {
         class: "pa-muted pa-small",
-        text: "Sign in below to chat with the tutor (same Llama/Groq path as grading)."
+        text: "Sign in below to chat with the tutor (same GPT-OSS/Groq path as grading)."
       }));
     }
 
@@ -1757,7 +1768,7 @@
       panel.appendChild(el("p", {}, [
         document.createTextNode("Signed in as "),
         el("strong", { text: user.email || user.name || user.$id }),
-        document.createTextNode(". Progress syncs to the cloud. Written checks and the Spanish tutor use Llama via Groq.")
+        document.createTextNode(". Progress syncs to the cloud. Written checks and the Spanish tutor use GPT-OSS via Groq.")
       ]));
       panel.appendChild(el("p", { class: "pa-muted pa-small", id: "pa-sync-line", text: syncMsg }));
       panel.appendChild(el("button", {

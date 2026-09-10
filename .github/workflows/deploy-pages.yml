@@ -29,6 +29,17 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
+      - name: Deploy Appwrite grade-check function
+        env:
+          APPWRITE_API_KEY: ${{ secrets.APPWRITE_API_KEY }}
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+        run: |
+          if [ -z "$APPWRITE_API_KEY" ] || [ -z "$GROQ_API_KEY" ]; then
+            echo "Skipping function deploy (APPWRITE_API_KEY / GROQ_API_KEY secrets not set)."
+            exit 0
+          fi
+          python3 scripts/deploy_grade_function.py
+
       - name: Build site
         run: python scripts/build_site.py
 

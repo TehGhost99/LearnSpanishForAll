@@ -28,8 +28,9 @@ Shared client + **automatic `client.ping()` on Practice load**: `assets/appwrite
 
 1. Appwrite Database `practice` + table/collection `progress` (one row per user)
 2. Web platforms: `tehghost99.github.io`, `localhost`, `127.0.0.1`
-3. Deploy `functions/grade-check` with `GROQ_API_KEY`
+3. Deploy `functions/grade-check` with `GROQ_API_KEY` (model: `openai/gpt-oss-20b`; Groq retired `llama-3.1-8b-instant`)
 4. Temporary `APPWRITE_API_KEY` so scripts can register platforms / deploy the function
+   (or set GitHub Actions secrets `APPWRITE_API_KEY` + `GROQ_API_KEY` so merge-to-main deploys the function)
 
 Local Practice works without those (browser-only saves).
 

@@ -5,10 +5,59 @@
  *   - "tutor": Spanish study helper chat (translations, grammar, alternatives)
  *              that must NOT reveal answers to active practice / test questions
  *
- * Env: GROQ_API_KEY
- * Model: Llama 3.1 8B Instant via Groq
+ * Groq decommissioned llama-3.1-8b-instant on 2026-08-16; default is GPT-OSS 20B.
+ *
+ * Env:
+ *   GROQ_API_KEY (required)
+ *   GROQ_MODEL (optional, default openai/gpt-oss-20b)
  */
-const MODEL = "llama-3.1-8b-instant";
+const DEFAULT_MODEL = "openai/gpt-oss-20b";
+const FALLBACK_MODEL = "openai/gpt-oss-20b";
+
+const GRADE_SCHEMA = {
+  type: "json_schema",
+  json_schema: {
+    name: "practice_grade",
+    strict: true,
+    schema: {
+      type: "object",
+      properties: {
+        grade: {
+          type: "string",
+          enum: ["correct", "mostly_correct", "incorrect"],
+        },
+        feedback: { type: "string" },
+      },
+      required: ["grade", "feedback"],
+      additionalProperties: false,
+    },
+  },
+};
+
+const TUTOR_SCHEMA = {
+  type: "json_schema",
+  json_schema: {
+    name: "tutor_reply",
+    strict: true,
+    schema: {
+      type: "object",
+      properties: {
+        reply: { type: "string" },
+      },
+      required: ["reply"],
+      additionalProperties: false,
+    },
+  },
+};
+
+function requestedModel() {
+  return (process.env.GROQ_MODEL || DEFAULT_MODEL).trim() || DEFAULT_MODEL;
+}
+
+function normalizeKey(raw) {
+  let k = String(raw || "").trim().replace(/^["']|["']$/g, "");
+  return k.replace(/^Bearer\s+/i, "").trim();
+}
 
 function corsHeaders() {
   return {
@@ -19,25 +68,28 @@ function corsHeaders() {
   };
 }
 
-async function callGroq(apiKey, messages, { temperature = 0.2, max_tokens = 400, json = true } = {}) {
-  const body = {
-    model: MODEL,
-    temperature,
-    max_tokens,
-    messages,
-  };
-  if (json) body.response_format = { type: "json_object" };
+function publicError(groqMessage) {
+  const msg = String(groqMessage || "");
+  if (/invalid api key|invalid_api_key|unauthorized/i.test(msg)) {
+    return "AI is temporarily unavailable (invalid Groq API key).";
+  }
+  if (/decommission|does not exist|model_not_found|model.*not.*found/i.test(msg)) {
+    return "AI is temporarily unavailable (the model was retired).";
+  }
+  if (/rate limit|too many requests/i.test(msg)) {
+    return "The AI is busy. Wait a moment and try again.";
+  }
+  return msg || "AI service failed.";
+}
 
-  const groqRes = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-    method: "POST",
-    headers: {
-      "content-type": "application/json",
-      authorization: "Bearer " + apiKey,
-    },
-    body: JSON.stringify(body),
-  });
-  const groqData = await groqRes.json();
-  return { groqRes, groqData };
+function isRetiredModelError(groqData) {
+  const msg = ((groqData && groqData.error && groqData.error.message) || "").toLowerCase();
+  const code = ((groqData && groqData.error && groqData.error.code) || "").toLowerCase();
+  return (
+    /decommission|model_not_found|does not exist|no longer (available|served)/.test(msg) ||
+    code === "model_not_found" ||
+    code === "model_decommissioned"
+  );
 }
 
 function parseJsonLoose(text) {
@@ -46,7 +98,75 @@ function parseJsonLoose(text) {
     .replace(/^```\s*/i, "")
     .replace(/\s*```$/, "")
     .trim();
-  return JSON.parse(cleaned);
+  try {
+    return JSON.parse(cleaned);
+  } catch (e) {
+    const start = cleaned.indexOf("{");
+    const end = cleaned.lastIndexOf("}");
+    if (start >= 0 && end > start) {
+      return JSON.parse(cleaned.slice(start, end + 1));
+    }
+    throw e;
+  }
+}
+
+function extractContent(groqData) {
+  const message = ((groqData && groqData.choices ? groqData.choices[0] : null) || {}).message || {};
+  return String(message.content || message.reasoning || "").trim();
+}
+
+async function callGroq(apiKey, messages, { temperature = 0.2, max_tokens = 400, schema = null, model } = {}) {
+  const useModel = model || requestedModel();
+
+  async function once(activeModel, useSchema) {
+    const body = {
+      model: activeModel,
+      temperature,
+      max_completion_tokens: max_tokens,
+      reasoning_effort: "low",
+      include_reasoning: false,
+      messages,
+    };
+    if (useSchema && schema) body.response_format = schema;
+
+    const groqRes = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        authorization: "Bearer " + apiKey,
+        "user-agent": "learnspanish-grade-check/1.0",
+      },
+      body: JSON.stringify(body),
+    });
+    const groqData = await groqRes.json();
+    return { groqRes, groqData, model: activeModel };
+  }
+
+  let result = await once(useModel, !!schema);
+
+  if (!result.groqRes.ok && isRetiredModelError(result.groqData) && useModel !== FALLBACK_MODEL) {
+    result = await once(FALLBACK_MODEL, !!schema);
+  }
+
+  // Groq json_schema / json_object can reject almost-valid output; recover it.
+  if (
+    !result.groqRes.ok &&
+    result.groqData &&
+    result.groqData.error &&
+    result.groqData.error.code === "json_validate_failed"
+  ) {
+    const failed = String(result.groqData.error.failed_generation || "").trim();
+    if (failed) {
+      return {
+        groqRes: { ok: true, status: 200 },
+        groqData: { choices: [{ message: { content: failed } }] },
+        model: result.model,
+      };
+    }
+    result = await once(result.model, false);
+  }
+
+  return result;
 }
 
 async function handleGrade(body, apiKey, { log, error, res }) {
@@ -81,27 +201,29 @@ Grade the answer as exactly one of:
 - mostly_correct — partially right or missing an important piece, but shows real understanding
 - incorrect — misses the point, contradicts the rubric, or is too vague/empty to judge
 
-Respond with ONLY valid JSON (no markdown fences):
+Respond with ONLY valid JSON (no markdown fences). In string values, do not wrap Spanish phrases in double quotes; use «guillemets» if needed.
 {"grade":"correct"|"mostly_correct"|"incorrect","feedback":"2-4 sentences. Be encouraging and specific. Say what worked and what to improve. Do not reveal a full model answer word-for-word."}`;
 
   try {
-    const { groqRes, groqData } = await callGroq(apiKey, [
-      {
-        role: "system",
-        content: "You grade short Spanish-learning answers. Reply with JSON only.",
-      },
-      { role: "user", content: prompt },
-    ]);
+    const { groqRes, groqData } = await callGroq(
+      apiKey,
+      [
+        {
+          role: "system",
+          content: "You grade short Spanish-learning answers. Reply with JSON only.",
+        },
+        { role: "user", content: prompt },
+      ],
+      { temperature: 0.2, max_tokens: 400, schema: GRADE_SCHEMA }
+    );
 
     if (!groqRes.ok) {
       error("Groq error: " + JSON.stringify(groqData));
       const msg = (groqData.error && groqData.error.message) || "Grading service failed.";
-      return res.json({ error: msg }, 502);
+      return res.json({ error: publicError(msg) }, 502);
     }
 
-    const text = (
-      (((groqData.choices || [])[0] || {}).message || {}).content || ""
-    ).trim();
+    const text = extractContent(groqData);
 
     let parsed;
     try {
@@ -157,7 +279,7 @@ Active practice context (do not answer this for them):
 phase=${phase || "none"} sessionMode=${mode || "none"}
 activeQuestion=${activeQuestion || "(none)"}
 
-Reply with ONLY valid JSON:
+Reply with ONLY valid JSON. In string values, do not wrap Spanish phrases in double quotes; use «guillemets» if needed.
 {"reply":"your helpful message in clear bilingual EN/ES when useful, max ~180 words"}`;
 
   const messages = [{ role: "system", content: system }];
@@ -169,21 +291,19 @@ Reply with ONLY valid JSON:
   messages.push({ role: "user", content: message.slice(0, 2000) });
 
   try {
-    const { groqRes, groqData } = await callGroq(
-      apiKey,
-      messages,
-      { temperature: 0.4, max_tokens: 500, json: true }
-    );
+    const { groqRes, groqData } = await callGroq(apiKey, messages, {
+      temperature: 0.4,
+      max_tokens: 500,
+      schema: TUTOR_SCHEMA,
+    });
 
     if (!groqRes.ok) {
       error("Groq tutor error: " + JSON.stringify(groqData));
       const msg = (groqData.error && groqData.error.message) || "Tutor service failed.";
-      return res.json({ error: msg }, 502);
+      return res.json({ error: publicError(msg) }, 502);
     }
 
-    const text = (
-      (((groqData.choices || [])[0] || {}).message || {}).content || ""
-    ).trim();
+    const text = extractContent(groqData);
 
     let parsed;
     try {
@@ -201,12 +321,14 @@ Reply with ONLY valid JSON:
   }
 }
 
+export { publicError, normalizeKey, parseJsonLoose, extractContent };
+
 export default async ({ req, res, log, error }) => {
   if (req.method === "OPTIONS") {
     return res.send("", 204, corsHeaders());
   }
 
-  const apiKey = process.env.GROQ_API_KEY;
+  const apiKey = normalizeKey(process.env.GROQ_API_KEY);
   if (!apiKey) {
     error("GROQ_API_KEY is not set");
     return res.json({ error: "AI is not configured (missing API key)." }, 500);
